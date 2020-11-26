@@ -13,12 +13,12 @@
     // It is safe to use, however, the explorer module. Even if it suffers one of its frequent crashes that corrupt the database, the info that
     // Navigator uses is never corrupted, so the user can keep using a corrupted explorer module safely.
     // If you set it to true, remember to enable the explorer module on Sia startup, and take in mind the module will need ~20GB+ on its own
-    "explorerAvailable": false,
+    "explorerAvailable": true,
 
     // Using MS SQL Server as the database engine if true. If false, Navigator will use SQLite.
     // SQLite requires no setup from the user an so it is optimal for an easy setup. Both databases are similary performant,
     // but with MS SQL Server the initial sync will be faster. You will need to install and configure SQL Server manually
-    "useMsSqlServer": false,
+    "useMsSqlServer": true,
 
     // This will query SC coin price tracking in CoinGecko and SF in Bisq if true. Using this means a centralization sacrifice, but enables detailed CSV
     // reports of transactions with FIAT conversions and also creates charts of the evolution of the balance of addresses. Set it to false (default: true)
@@ -28,30 +28,30 @@
     // Website customization: color theme
     "colors": {
         // The main color them of Navigator, related to your branding
-        "accent": "#1a874b",
-        
+        "accent": "#307fe2",
+
         // Background of the header of the site 
         "headerBackground": "#1c1f1d",
 
         // The accent color, but two tones less saturated
-        "accentFaded1": "#49664e",
-        "accentFaded2": "#427c4b",
+        "accentFaded1": "#5483be",
+        "accentFaded2": "#4281d0",
 
         // The accent color less saturated an with brightness closer to the backround. `decorationSubtle` should be very close to background,
         // while `decorationContrast` should have more contrast. These colors are used for decorative elements directly on top of the background
-        "decoration": "#7e9489",
-        "decorationSubtle": "#3e664e",
-        "decorationContrast": "#9eb4a9",
+        "decoration": "#86b4ee",
+        "decorationSubtle": "#16519a",
+        "decorationContrast": "#a8c9f3",
 
         // Background of the site
         "background": "#2b2f2d",
-        
+
         // Shadow of tables. Just subtly different from background
         "tableShadow": "#202622",             
-        
+
         // Color of text
         "text": "#c0c0c0",
-        
+
         // Basic colors
         "yellow": "#aba147",
         "red": "#dd5e5e",
@@ -59,7 +59,7 @@
         "green": "#5cae81",
         "darkGreen": "#2ba84b",
         "lime": "#809741",
-        
+
         // Header of tables. Needs to contrast sharply with the background
         "boxHeaders": "#777777",
 
@@ -68,7 +68,7 @@
 
         // Borders of tables
         "tableBorders": "#333333",
-        
+
         // Max black and white, and different tones of grey
         "white": "#ffffff",
         "black": "#000000",
@@ -92,10 +92,10 @@
 
     // Donation address. It will be displayed to the user as a suggestion after requesting a CSV transaction history report.
     // Default address is my donations address
-    "donationAddress": "bde3467039a6d9a563224330ff7578a027205f1f2738e1e0daf134d8ded1878cf5870c41927d",
+    "donationAddress": "e52092ada56c4db04c093629010d8fb57ef6d885b70fe13d6dee55d73b865a5dd232ea235787",
 
     // The link to your Github repository. An icon will be displayed at the footer of the webpage with the link
-    "githubRepository": "https://github.com/hakkane84/navigator-sia",
+    "githubRepository": "https://github.com/420coupe/navigator-scp",
 
     // "Routers" is a technology by keops.cc that allows Navigator to interact safely with Sia daemons in remote location. The router needs
     // to be installed in the remote machine, and at the time of writing this, the code is not yet ready to be open sourced. By default,
@@ -104,34 +104,40 @@
     "useRouters": false,
 
     // If using a local Sia daemon (useRouters=false), indicate here the the net address and port of it. Default: 'localhost:9980'
-    "localDaemon": "localhost:9980",
+    "localDaemon": "localhost:4280",
 
     // Routers information. It doesn't need to be configured unless 'useRouters' (above) is configured as "true"
     "siaRouters": [],
     "siaRoutersAuthkey": "",
 
     // Parameters for accessing the MS-SQL database. Configure this only if MS SQL Server is being used. SQLite doesn't need any configuration
-    "sqlLogin": {
+    "sql": {
         "server": "localhost",
-        "database": "navigator",
-        "user": "",
-        "password": "",
+        "database": "nav",
+        "user": "user",
+        "password": "password",
         "port": 1433,
-        "connectionTimeout": 60000,
-        "requestTimeout": 60000,
+        "connectionTimeout": 600000,
+        "requestTimeout": 600000,
+        "options": {
+            "encrypt": false
+        },
         "pool": {
-            "max": 100,
+            "max": 1000,
             "min": 0,
-            "idleTimeoutMillis": 30000
+            "idleTimeoutMillis": 300000
         }
     },
-
+    "scpdaemon": {
+        "ip": "localhost",
+        "port": "4280"
+    },
     // Public IP of this server. Example: `121.31.2.414` or `myexplorer.com`
-    "publicIp": "",
+    "publicIp": "scprime.info",
 
     // Ports used by the API and web server
-    "httpPort": 80,
-    "httpsPort": 443,
+    "httpPort": 1337,
+    "httpsPort": 1338,
 
     // Set this to true if you want to use SSL authentication for the API and webserver. Remember to place the certificates on the
     // path indicated bellow
@@ -142,7 +148,7 @@
     // * `navigator.key`
     // * `navigator.crt`
     // * `navigator.ca-bundle`
-    "sslCertificatesPath": "./modules/ssl_certificates/",
+    "sslCertificatesPath": "./modules/ssl_certificate/",
 
     // API server limits:
     // The limit of queries a single IP can do per day. This avoids Google bots and other crawlers to siege the server. 25000 queries/day is default
@@ -159,9 +165,9 @@
 
     // API logs verbosity. False by default
     "verboseApiLogs": true, // An entry will be printed for every request to the API server
-    "hourlyApiLogs": false, // Usage stats, hourly
-    "dailyApiLogs": false, // Usage daily stats, including number of requests per IP
+    "hourlyApiLogs": true, // Usage stats, hourly
+    "dailyApiLogs": true, // Usage daily stats, including number of requests per IP
 
     // How often the user browser will check for updating the landing page. Default: 15000 milliseconds
     "landingRefreshPeriod": 15000
-}
+} 

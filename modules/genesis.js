@@ -10,7 +10,7 @@ exports.GenesisIndexing = async function(params, api) {
 
         // A - SiaFund airdrops
         if (api.transactions[i].siafundoutputs.length > 0) {
-            
+
             // Tx info
             var toAddTxInfo = "('" + masterHash + "',''," + api.height+ "," + api.timestamp + ",0)"
             sqlBatch.push(SqlComposer.InsertSql(params, "TxInfo", toAddTxInfo, masterHash))
@@ -58,7 +58,7 @@ exports.GenesisIndexing = async function(params, api) {
 
         // B - Siacoin airdrops. There are not on the Sia blockchain, but this code exists for other forks
         if (api.transactions[i].siacoinoutputs.length > 0) {
-            
+
             // Tx info
             var toAddTxInfo = "('" + masterHash + "',''," + api.height+ "," + api.timestamp + ",0)"
             sqlBatch.push(SqlComposer.InsertSql(params, "TxInfo", toAddTxInfo, masterHash))
@@ -75,8 +75,8 @@ exports.GenesisIndexing = async function(params, api) {
                 var outputId = api.transactions[i].siacoinoutputs[j].id
 
                 // AddressesChanges
-                var toAddAddressChanges = "('" + address + "','" + masterHash + "',0," + value 
-                    + ",0," + api.timestamp + ",'ScTx')"
+                var toAddAddressChanges = "('" + address + "','" + masterHash + "'," + BigInt(value) 
+                    + ",0"+",0," + api.timestamp + ",'ScTx')"
                 var checkString = address + "' and MasterHash='" + masterHash
                 sqlBatch.push(SqlComposer.InsertSql(params, "AddressChanges", toAddAddressChanges, checkString))
 
@@ -100,7 +100,7 @@ exports.GenesisIndexing = async function(params, api) {
             }
 
             // Tx in a block (BlockTransactions)
-            var toAddBlockTransactions = "(" + api.height + ",'" + masterHash + "','ScTx',0," + totalSCtransacted + ")"
+            var toAddBlockTransactions = "(" + api.height + ",'" + masterHash + "','ScTx'," + totalSCtransacted + ",0)"
             sqlBatch.push(SqlComposer.InsertSql(params, "BlockTransactions", toAddBlockTransactions, masterHash))
         }
     }

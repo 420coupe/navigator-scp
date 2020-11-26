@@ -41,7 +41,7 @@ console.log("Logging started: " + datetime)
 
 // Informing the user if Navigator is using a local Sia node or a network of Routers
 if (params.useRouters == false) {
-    console.log("* Navigator will use a local Sia instance in port 9980")
+    console.log("* Navigator will use a local Scprime instance in port 4280")
 } else {
     console.log("* Navigator is using a network of " + params.siaRouters.length + " Routers")
 }
@@ -90,7 +90,7 @@ async function initialMaintenance() {
         } catch (e) {
             var blockEnd = 0
         }
-        
+
         if (blockEnd <= repairFromBlock) {
             console.log("*** Wrong repair argument. It needs to be a block height smaller than the current highest block indexed")
         } else {
@@ -101,11 +101,11 @@ async function initialMaintenance() {
             console.log("*** Database repair ordered from block " + repairFromBlock + " to " + blockEnd + ". Repair of blocks will take "
                 + "place only while the blockchain indexer is iddle \n*** Repair will continue even after restarts \n*** To cancel it, "
                 + "delete the file repair.json")
-            
+
             // Saving the repair order as a JSON object
             fs.writeFileSync("repair.json", JSON.stringify(repair))
         }
-        
+
     }
 
     // Initializing the Watchdog
@@ -117,7 +117,7 @@ async function initialMaintenance() {
 
 async function getBlocksToIndex(blocksToPurgeNum) {
     // Gets the blocks actually indexes, find gaps and creates an array of blocks to be indexed
-    
+
     // A - Get current consensus height. Start with router number 0
     var api = await Commons.MegaRouter(params, 0, '/consensus')
     var currentHeight = parseInt(api.height)
@@ -128,7 +128,7 @@ async function getBlocksToIndex(blocksToPurgeNum) {
     var sqlBlocks = await SqlAsync.Sql(params, sqlQuery)
     try {
         console.log("Blocks in SQL database: " + sqlBlocks.length)
-        
+
         // C - Purge the last purgeBlocksOnStartup (3 blocks by default). This is a security measure in case of blockchain reorgs or
         // a corrupted database due to incomplete indexing on a crash
         var blocksToPurge = []
@@ -199,7 +199,7 @@ async function blockRequest(blocksToIndex, accumulatedQueries, tenBlocksTimestam
         // A - Check if there are blocks remaining
         if (blocksToIndex.length == 0) {
             preStandByForBlocks()
-        
+
         } else {
             var blockStartTime = Math.floor(Date.now() / 1000)
             var block = blocksToIndex[0]
@@ -212,7 +212,7 @@ async function blockRequest(blocksToIndex, accumulatedQueries, tenBlocksTimestam
                 // Check the consensus height
                 var api = await Commons.MegaRouter(params, 0, '/consensus')
                 var currentHeight = parseInt(api.height)
-                
+
                 // Update file
                 await statusFileFullUpdate(currentHeight, block)
 
@@ -221,7 +221,7 @@ async function blockRequest(blocksToIndex, accumulatedQueries, tenBlocksTimestam
                     var date = new Date()
                     var hh = date.getHours()
                     var mm = date.getMinutes()
-                    
+
                     if (hh == 0 && mm < 15) {
                         // Checking if it is already inserted on the database or not
                         var dayBegin = await ExchangeRates.DayBeginTime(date.getTime())
@@ -270,7 +270,7 @@ async function blockRequest(blocksToIndex, accumulatedQueries, tenBlocksTimestam
                     }
                 }
             }
-            
+
             // L - Next block. We remove the first element of the array
             blocksToIndex.shift()
             blockRequest(blocksToIndex, accumulatedQueries, tenBlocksTimestamp)
@@ -307,7 +307,7 @@ async function standByForBlocks(sqlHeight) {
         var date = new Date()
         var hh = date.getHours()
         var mm = date.getMinutes()
-        
+
         if (hh == 0 && mm < 15) {
             // Checking if it is already inserted on the database or not
             var dayBegin = await ExchangeRates.DayBeginTime(date.getTime())
@@ -318,13 +318,13 @@ async function standByForBlocks(sqlHeight) {
             } 
         }
     }
-    
+
 
     // B - Priority 2: Check for newly indexed blocks
     var api = await Commons.MegaRouter(params, 0, '/consensus')
     var consensusHeight = parseInt(api.height)
     if (consensusHeight > sqlHeight) {
-        
+
         // Create the new bacth of blocks
         var blocksToIndex = []
         for (var i = (sqlHeight+1); i <= consensusHeight; i++) {
@@ -334,7 +334,7 @@ async function standByForBlocks(sqlHeight) {
         // Launch indexing. Previous to start indexing, we try to detect blockhain reorganizations, reindex changed 
         // blocks and keep track of the reorg
         checkReorgs(sqlHeight, blocksToIndex, [])
-    
+
     } else {
         // C - Priority 3: Index a batch of 10 blocks from the repair order, if it exists
         var skipDelay = false
@@ -345,7 +345,7 @@ async function standByForBlocks(sqlHeight) {
                 blocksToRepair.push(i)
             }
             console.log("*** Repairing the blocks segment: " + blocksToRepair[0] + " - " + blocksToRepair[blocksToRepair.length-1])
-            
+
             // Sequential deletion and re-indexing
             for (var i = 0; i < blocksToRepair.length; i++) {
                 await Indexer.BlockDeleter(params, blocksToRepair[i])
@@ -354,7 +354,7 @@ async function standByForBlocks(sqlHeight) {
                 var blockEndTime = Math.floor(Date.now() / 1000)
                 console.log("Block " + blocksToRepair[i] + " reindexed in " + (blockEndTime - blockStartTime) + " sec")
             }
-            
+
             // Updating the file, or deleting it if these were the last blocks
             repairOrder.blockStart = repairOrder.blockStart + 10
             if (repairOrder.blockStart <= repairOrder.blockEnd) {
@@ -364,6 +364,15 @@ async function standByForBlocks(sqlHeight) {
                 // Delete file
                 fs.unlinkSync("repair.json")
                 console.log("*** This is the last segment of the repair order!")
+            }
+
+            // Sequential deletion and re-indexing
+            for (var i = 0; i < blocksToRepair.length; i++) {
+                await Indexer.BlockDeleter(params, blocksToRepair[i])
+                var blockStartTime = Math.floor(Date.now() / 1000)
+                await Indexer.BlockIndexer(params, blocksToRepair[i])
+                var blockEndTime = Math.floor(Date.now() / 1000)
+                console.log("Block " + blocksToRepair[i] + " reindexed in " + (blockEndTime - blockStartTime) + " sec")
             }
 
             console.log() // Spacer
@@ -411,7 +420,7 @@ async function statusFileFullUpdate(consensusHeight, sqlHeight) {
         var transactionCount = topBlock[0].TransactionCount
         var coinSupply = Math.round(topBlock[0].TotalCoins / params.blockchain.coinPrecision)
     }
-    
+
     // Building and saving array
     var statusArray = [{
         "consensusblock": consensusHeight,
@@ -441,7 +450,7 @@ async function statusFilePartialUpdate(consensusHeight, sqlHeight) {
         statusArray[0].heartbeat = new Date().valueOf()
         statusArray[0].mempool = await Mempool.Index(params)
         fs.writeFileSync("status.json", JSON.stringify(statusArray))
-        
+
     } catch (e) {
         // Error, we create a new file from scratch (takes a bit longer)
         console.log("// Status file not found or corrupted. Creating a new one")
@@ -459,12 +468,16 @@ async function landingApi(params) {
     var last10Others = SqlComposer.SelectTopWhere(params, "BlockTransactions", "Height,TxHash,TxType", "Height", 10,
         "TxType='SfTx' OR TxType='host ann' OR TxType='blockreward'")
     var last10Blocks = SqlComposer.SelectTop(params, "BlockInfo", "Height,MiningPool,Timestamp", "Height", 10)
+    var last10ScpRich = SqlComposer.SelectTopSCP(params, 10)
+    var last10SpfRich = SqlComposer.SelectTopSPF(params, 10)
 
     var api = {
         last10ScTx: await SqlAsync.Sql(params, last10ScTx),
         last10Contracts: await SqlAsync.Sql(params, last10Contracts),
         last10Others: await SqlAsync.Sql(params, last10Others),
-        last10Blocks: await SqlAsync.Sql(params, last10Blocks)
+        last10Blocks: await SqlAsync.Sql(params, last10Blocks),
+        last10ScpRich: await SqlAsync.Sql(params, last10ScpRich),
+        last10SpfRich: await SqlAsync.Sql(params, last10SpfRich)
     }
 
     // Saving API
@@ -550,4 +563,3 @@ async function saveOrphanedBlocks(blocksOrphaned) {
         await SqlAsync.Sql(params, sqlInsertion)
     }
 }
-

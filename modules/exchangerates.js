@@ -10,9 +10,9 @@ exports.PopulateExchangeData = async function(params, currencyNum, attempt) {
     // Requests exchange rates from the coingecko API for each currency in params.exchangeCurrencies
 
     if (currencyNum < params.exchangeCurrencies.length) { // If this is not the last currency
-        var apiAddress = "https://api.coingecko.com/api/v3/coins/siacoin/market_chart?vs_currency=" + params.exchangeCurrencies[currencyNum] + "&days=max"
+        var apiAddress = "https://api.coingecko.com/api/v3/coins/siaprime-coin/market_chart?vs_currency=" + params.exchangeCurrencies[currencyNum] + "&days=max"
         console.log("* Getting " + params.exchangeCurrencies[currencyNum] + " from CoinGecko")
-        
+
         await axios.get(apiAddress).then(async function (response) {
             var api = response.data.prices
             await insertExchangeRates(api, params, currencyNum, attempt)
@@ -33,7 +33,7 @@ exports.PopulateExchangeData = async function(params, currencyNum, attempt) {
                 await ExchangeRates.PopulateExchangeData(params, currencyNum, attempt)
             }
         })
-        
+
     } else {
         console.log("* Exchange rates database building complete!")
 
@@ -45,12 +45,12 @@ exports.PopulateExchangeData = async function(params, currencyNum, attempt) {
 exports.PopulateSiafundExchangeRates = async function(params, attempt) {
     // Updates the data on the exchanges database with Siafund rates from Bisq
     console.log("* Getting SF rates from Bisq")
-    
+
     var apiAddress = "https://markets.bisq.network/api/trades?market=sf_btc&limit=100000"
     await axios.get(apiAddress).then(async function (response) {
         var api = response.data
         await insertSiafundRates(params, api)
-        
+
     }).catch(async function (error) {
         // Next attempt after 30 seconds
         console.log("// Failed getting data from Bisq. Repeating in 1 minute")
@@ -92,7 +92,7 @@ async function insertSiafundRates(params, api) {
         arrayTrades[day].value = arrayTrades[day].value + (parseFloat(api[i].price) * parseInt(api[i].amount))
         arrayTrades[day].amount = arrayTrades[day].amount + parseInt(api[i].amount)
     }
-    
+
     // Getting the SC<->BTC rates from the database
     var sqlQuery = "SELECT Timestamp, BTC FROM ExchangeRates"
     var btcPrices = await SqlAsync.Sql(params, sqlQuery)
@@ -114,7 +114,7 @@ async function insertSiafundRates(params, api) {
             if ((time > parseInt(btcPrices[j].Timestamp) - 43000) 
                 && (time < parseInt(btcPrices[j].Timestamp) + 43000)) { // Some error allowed
                 arrayTrades[i].priceSc = (parseFloat(btcPrices[j].BTC) / arrayTrades[i].priceBtc).toFixed(18)
-                
+
                 // Correcting the timestamp, matching the database
                 arrayTrades[i].time = btcPrices[j].Timestamp
             }
@@ -157,7 +157,7 @@ async function insertExchangeRates(api, params, currencyNum, attempt) {
             console.log("// Error inserting " + timestamp + " into " + params.exchangeCurrencies[currencyNum])
         }  
     }
-    
+
     // Next currency after timeout 10sec
     attempt = 0
     currencyNum++
@@ -174,10 +174,10 @@ exports.DayBeginTime = async function(UNIX_timestamp) {
 
 exports.DailyExchangeData = async function(params) {
     // Gets updated exchange rates and saves them once per day
-    
+
     console.log("* Updating exchange rates from CoinGecko")
-    var apiAddress = "https://api.coingecko.com/api/v3/coins/siacoin?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=false"
-    
+    var apiAddress = "https://api.coingecko.com/api/v3/coins/siaprime-coin?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=false"
+
     await axios.get(apiAddress).then(async function (response) {
         var api = response.data.market_data.current_price
         var timestamp = await ExchangeRates.DayBeginTime(new Date().getTime())
@@ -189,7 +189,7 @@ exports.DailyExchangeData = async function(params) {
 
         for (var i = 0; i < params.exchangeCurrencies.length; i++) {
             sqlQuery = sqlQuery + params.exchangeCurrencies[i] 
-            
+
             if (i < (params.exchangeCurrencies.length - 1)) {
                 sqlQuery = sqlQuery +  ", "
             }
@@ -200,7 +200,7 @@ exports.DailyExchangeData = async function(params) {
 
         for (var i = 0; i < params.exchangeCurrencies.length; i++) {
             sqlQuery = sqlQuery + api[params.exchangeCurrencies[i].toLowerCase()]
-            
+
             if (i < (params.exchangeCurrencies.length - 1)) {
                 sqlQuery = sqlQuery +  ", "
             }
@@ -215,15 +215,15 @@ exports.DailyExchangeData = async function(params) {
 
         for (var i = 0; i < params.exchangeCurrencies.length; i++) {
             sqlQuery = sqlQuery + params.exchangeCurrencies[i] + "=" + api[params.exchangeCurrencies[i].toLowerCase()]
-            
+
             if (i < (params.exchangeCurrencies.length - 1)) {
                 sqlQuery = sqlQuery +  ", "
             }
         }
-        
+
         sqlQuery = sqlQuery + " WHERE Timestamp=" + timestamp
             + " END"
-        
+
         //console.log(sqlQuery)
         await updateExchangeData(params, sqlQuery, timestamp)
 
@@ -264,12 +264,12 @@ async function dailySiafundExchangeData(params, timestamp) {
         var api = response.data
         var btc = parseFloat(api[0].last)
         await updateCurrentSiafundExchange(params, timestamp, btc)
-        
+
     }).catch(async function (error) {
         // Next attempt after 10 minutes
         console.log("// Failed getting updated data from Bisq. Repeating in 10 minutes")
         //console.log(error)
-        
+
         setTimeout(function(){
             dailySiafundExchangeData(params, timestamp)
         }, 600000);
@@ -285,7 +285,7 @@ async function updateCurrentSiafundExchange(params, timestamp, btc) {
     var scToBtc = btcPrices[0].BTC
 
     var priceInSc = (scToBtc / btc).toFixed(18)
-    
+
     // SQL insertion
     var sqlQuery = "UPDATE ExchangeRates"
         + " SET SF=" + priceInSc
@@ -293,4 +293,4 @@ async function updateCurrentSiafundExchange(params, timestamp, btc) {
     await SqlAsync.Sql(params, sqlQuery)
 
     console.log("* Siafund rates data successfully updated")
-}
+} 

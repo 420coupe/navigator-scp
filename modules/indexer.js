@@ -21,7 +21,7 @@ exports.BlockIndexer = async function(params, block) {
 
     // C1 - Get the missing information about outputs and sending addresses. This enriches the API
     var api = await ParentFinder.ParentFinder(params, apiConsensus)
-    
+
     // Debug lines for saving the outputs of the Explorer API and the Consensus API (after being completed by parentfinder.js)
     // Keep them in comments unless debugging
     //var apiExplorer = await Commons.MegaRouter(params, 0, '/explorer/blocks/' + block)
@@ -184,17 +184,29 @@ exports.BlockIndexer = async function(params, block) {
 async function minerPayoutProcessor(params, sqlBatch, addressesImplicated, height, timestamp, api) {
     // Processes the payout of a mining pool and assigns a block to a pool
     var payoutAddress = api.minerpayouts[0].unlockhash
+    var blockReward = parseInt(api.minerpayouts[0].value)
+    var devFee = parseInt(api.minerpayouts[1].value)
+    var devFeeAddress = api.minerpayouts[1].unlockhash
+    var totalReward = blockReward + devFee
 
     // The transaction ID of a miner payout is the hash of the block, however, this would conflict in Navigator's SQL
     // database. Instead, I create an artificial TxID where I replace the first two characters of the block hash by
     // a "BR" (block reward)
     var minerPayoutTxId = "BR" + api.id.slice(2)
-    
+
     // Address change. Add it to the Addresses Implicated array
     addressesImplicated.push({
         hash: payoutAddress, 
         masterHash: minerPayoutTxId,
-        sc: parseInt(api.minerpayouts[0].value),
+        sc: blockReward,
+        sf: 0,
+        txType: 'blockreward'
+    })
+
+    addressesImplicated.push({
+        hash: devFeeAddress,
+        masterHash: minerPayoutTxId,
+        sc: devFee,
         sf: 0,
         txType: 'blockreward'
     })
@@ -204,16 +216,16 @@ async function minerPayoutProcessor(params, sqlBatch, addressesImplicated, heigh
     sqlBatch.push(SqlComposer.InsertSql(params, "TxInfo", toAddTxInfo, minerPayoutTxId))
 
     // Saving TX as a component of a block
-    var toAddBlockTransactions = "(" + height + ",'" + minerPayoutTxId + "','blockreward'," + parseInt(api.minerpayouts[0].value) + ",0)"
+    var toAddBlockTransactions = "(" + height + ",'" + minerPayoutTxId + "','blockreward'," + totalReward + ",0)"
     sqlBatch.push(SqlComposer.InsertSql(params, "BlockTransactions", toAddBlockTransactions, minerPayoutTxId))
 
     // Miner payout as hash type
     var toAddHashTypes = "('" + minerPayoutTxId + "','blockreward','')"
     sqlBatch.push(SqlComposer.InsertSql(params, "HashTypes", toAddHashTypes, minerPayoutTxId))
-    
+
     // Add the new output
     sqlBatch = await Outputs.MiningPoolPayoutOutput(params, sqlBatch, api, height, payoutAddress)
-    
+
     // Mining pool name
     var miningPool = "Unknown" // Default 
     for (var a = 0; a < params.poolsDb.length; a++) { // For each pool
@@ -272,8 +284,8 @@ exports.BlockDeleter = async function(params, height) {
         // Those unspent get deleted.
         sqlBatch.push("DELETE FROM Outputs WHERE CreatedOnBlock=" + height + " AND Spent IS NULL")
         sqlBatch.push("UPDATE Outputs SET Spent=NULL, SpentOnBlock=null WHERE SpentOnBlock=" + height)
-    
-        
+
+
         // D - Update current balances
         // Adapt "changes" to the addressesImplicated format
         var addressesImplicated = []

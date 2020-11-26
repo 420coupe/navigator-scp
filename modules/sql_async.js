@@ -92,7 +92,7 @@ exports.BacthInsert = async function(params, sqlBatch, height, indexing) {
                 var result = await SqlAsync.Sql(params, sqlBatch[i])
                 if (result == false) {
                     failedItemizedQueries++
-                    console.log("// Failed itemized query for block " + height)
+                    console.log("// Failed itemized query for block " + height + " " + sqlBatch[i])
                 }
             }
 
@@ -141,7 +141,7 @@ exports.CheckExchangesDatabase = async function(params)
         } catch (e) {
             console.log("* No Exchange rates table found. Creating a new one")
             var sqlQuery = await createExchangeTableMsSql(params)
-            
+
             try {
                 var result = await pool.request().query(sqlQuery)
                 console.log("* Populating the table with data from CoinGecko. It will take ~5 minutes. Blockchain indexing will start shortly after that")
@@ -161,7 +161,7 @@ exports.CheckExchangesDatabase = async function(params)
 
             // This sql statement might not work in SQLite
             var sqlQuery = await createExchangeTableMsSql(params)
-            
+
             // Adapting the syntax to particularities of SQLite
             if (params.useMsSqlServer == false) {
                 sqlQuery = SqlComposer.SqLiteAdapter(sqlQuery)
@@ -314,7 +314,7 @@ async function createNavigatorTables(params) {
     sqlQueries[8] = "CREATE INDEX IX_ContractInfo ON ContractInfo (Height)"
     sqlQueries[9] = "CREATE INDEX IX_ContractInfo_1 ON ContractInfo (ContractId)"
     sqlQueries[10] = "CREATE INDEX IX_ContractInfo_2 ON ContractInfo (WindowEnd)"
-    
+
     // ContractResolutions
     sqlQueries[11] = "CREATE TABLE ContractResolutions ("
         + "MasterHash char(64) PRIMARY KEY, "
@@ -407,7 +407,7 @@ async function createNavigatorTables(params) {
         + ")"
     sqlQueries[27] = "CREATE INDEX IX_AddressesBalance ON AddressesBalance (BalanceSc)"
     sqlQueries[28] = "CREATE INDEX IX_AddressesBalance_1 ON AddressesBalance (BalanceSf)"
-    
+
     // Reorgs
     sqlQueries[29] = "CREATE TABLE Reorgs ("
         + "Hash char(64), "
@@ -462,4 +462,3 @@ async function createNavigatorTables(params) {
 
     return
 }
-

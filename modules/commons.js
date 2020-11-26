@@ -1,6 +1,6 @@
 // Miscelaneous functions, including calls to the Sia daemon
 var exports = module.exports={}
-var sia = require('sia.js');
+var sia = require('scprime.js');
 var axios = require('axios')
 var request = require('request')
 var Commons = require('./commons.js')
@@ -47,7 +47,7 @@ exports.MegaRouter = async function(params, routerNum, call, oneTry) {
                 // Return null, don't repeat
                 return null
             } else {
-                console.log("// Local Sia node unavailable for a " + call + " call. Timing out " + params.routerTimeout + "ms")
+                console.log("// Local Scp node unavailable for a " + call + " call. Timing out " + params.routerTimeout + "ms")
                 // Repets the call after a timeout
                 await Commons.Delay(params.routerTimeout); // Timeout
                 api = await Commons.MegaRouter(params, 0, call)
@@ -55,7 +55,7 @@ exports.MegaRouter = async function(params, routerNum, call, oneTry) {
             }
         }
     }
-       
+
 }
 
 
@@ -64,7 +64,7 @@ async function siaGetCall(router, routerAuthKey, call) {
     try {
         var result = await axios.post(router, {
             wrapper: 'sia',
-            ip: "localhost:9980",
+            ip: "localhost:4280",
             call: call,
             authkey: routerAuthKey
         })
@@ -88,7 +88,7 @@ async function siaGetCall(router, routerAuthKey, call) {
 async function siaLocalCall(params, call) {
     // APi call to the local Sia daemon
     try {
-        var siad = await sia.connect(params.localDaemon)
+        var spd = await sia.connect(params.localDaemon)
         var api = await siaCall(params, call)
         if (api != null) {
 			api = JSON.parse(api)
@@ -105,7 +105,7 @@ const siaCall = (params, call) => new Promise((resolve, reject) => {
 	const callOptions = {
 		url: "http://" + params.localDaemon + call,
 		timeout: 60000,
-		headers: {'User-agent': 'Sia-Agent'}
+		headers: {'User-agent': 'ScPrime-Agent'}
 	}
 	request(callOptions, (err, res, body) => {
 		if (!err && (res.statusCode < 200 || res.statusCode > 299)) {

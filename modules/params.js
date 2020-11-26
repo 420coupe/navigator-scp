@@ -44,24 +44,25 @@ exports.Params = function(config, scriptPath)
 
     // Sia blockchain parameters
     var blockchain = {
-        genesisDifficulty: 34359738367,
+        genesisDifficulty: 36028797018963967,
         genesisHashrate: 0,
+	premine: BigInt(10551840000000000000000000000000000),
         initialBlockReward: BigInt(300000000000000000000000000000),
-        endBlockReward: BigInt(30000000000000000000000000000),
+        endBlockReward: BigInt(10000000000000000000000000000),
         decayBlockReward: BigInt(1000000000000000000000000), // Reduction of the reward on each block
         hashrateEstimationBlocks: 200, // Number of previous blocks used to estimate the network hashrate. The default of 200 is the same used by the Sia Explorer module,
-        siafundFees: 0.039,
-        totalSiafunds: 10000,
-        dustThreshold: 1000000000000000000000, // Arbitrary. Bellow this threshold, we consider the amount as "dust" and wont compute it for balances of addresses. 1 milliSia by default
-        coinPrecision: 1000000000000000000000000 // How many Hastings make a coin
+        siafundFees: 0.150,
+        totalSiafunds: 30000,
+        dustThreshold: 1000000000000000000000000, // Arbitrary. Bellow this threshold, we consider the amount as "dust" and wont compute it for balances of addresses. 1 milliSia by default
+        coinPrecision: 1000000000000000000000000000 // How many Hastings make a coin
     }
 
     // SQL database connection
     if (config.useMsSqlServer == true) {
         var sqLiteDb = null
-        
+
         // Single MS-SQL connection pool accross every route
-        var msSqlPoolPromise = new sql.ConnectionPool(config.sqlLogin)
+        var msSqlPoolPromise = new sql.ConnectionPool(config.sql)
         .connect()
         .then(pool => {
             console.log('* Connected to MS-SQL!')
@@ -70,7 +71,7 @@ exports.Params = function(config, scriptPath)
         .catch(err => console.log('//// MS-SQL Database Connection Failed! Bad Config: ', err))
     } else {
         var msSqlPoolPromise = null
-        
+
         // SQLite
         var sqLiteDb = new sqLite.Database(sqliteDbPath + 'navigator.db', (err) => {
             if (err) {
@@ -91,7 +92,7 @@ exports.Params = function(config, scriptPath)
         // This is for SQLite. 950 is the top possible limit
         var sqlArgumentsSize = 950
     }
-    
+
 
     // Exchange rates for these currencies. A table with the exchange rates will be created to be used on the .CSV reports
     var exchangeCurrencies = [
@@ -125,7 +126,7 @@ exports.Params = function(config, scriptPath)
     var rawFile = fs.readFileSync(scriptPath + "poolAddresses.json")
     var poolsDb = JSON.parse(rawFile)
 
-  
+
     // Mega-array containing all the parameters, to easily pass from one script to the next
     var params = {
         explorerAvailable: config.explorerAvailable,
@@ -135,7 +136,7 @@ exports.Params = function(config, scriptPath)
         siaRouters: config.siaRouters,
         siaRoutersAuthkey: config.siaRoutersAuthkey,
         routerTimeout: routerTimeout,
-        sqlLogin: config.sqlLogin,
+        sql: config.sql,
         useMsSqlServer: config.useMsSqlServer,
         msSqlPoolPromise: msSqlPoolPromise,
         sqLiteDb: sqLiteDb,

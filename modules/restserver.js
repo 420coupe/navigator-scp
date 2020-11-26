@@ -68,7 +68,7 @@ exports.Restserver = async function(params) {
                 IpIsAllowed = false
             }
         }
-        
+
         // Checking the IP stats of the day
         if (maxRequestsPerIP != 0) {
             var IpMatch = false
@@ -191,7 +191,7 @@ exports.Restserver = async function(params) {
         // Logging activity
         dayStatusCalls++
         hourStatusCalls++
-        
+
         // Reads the file status.json     
         try {
             var data = fs.readFileSync("./status.json")
@@ -211,7 +211,7 @@ exports.Restserver = async function(params) {
                 }
                 res.json(statusResponse);
             }, 5000)
-            
+
         } else {
             res.json(statusResponse);
         }
@@ -254,19 +254,22 @@ exports.Restserver = async function(params) {
 
     // Rest of static content
     router.use(express.static(params.websitePath))
+
     
-       
     // Coin supply in a plain number, as per requested by CoinMarketCap
     router.get('/navigator-api/totalcoins', function(req, res) {
         ApiFunctions.TotalCoins(params, res, req)
     });
-
 
     // HTCPCP compliance :-)
     router.route('/navigator-api/coffee').get(function(req, res) {
         res.status(418).send('Sorry, I am a teapot, not a coffe maker')
     });
 
+    // Cam's Richlist API
+        router.route('/navigator-api/richlist/:v').get(function (req, res) {
+                    ApiFunctions.RichList(params, res, req)
+    });
 
     // =============================================
     //                 END OF PATHS
@@ -291,7 +294,7 @@ exports.Restserver = async function(params) {
         httpsServer.timeout = params.apiTimeout // Timeout of requests
         console.log('* API HTTPS server running on port: ' + params.httpsPort)
     }
-    
+
 
     // Optional hourly statistics of usage
     if (params.hourlyApiLogs == true) {

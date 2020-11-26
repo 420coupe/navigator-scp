@@ -17,14 +17,14 @@ exports.MultiSelect = async function(columns, table, whereCondition, whereArray,
             }
         }
     }
-    
+
     return sqlQuery
 }
 
 
 exports.InsertSql= function(params, table, toAdd, toCheck) {
     // Constructing the SQL query, depending on the table to update. It returns the SQL sentenceto be included on the batch
-    
+
     if (table == "BlockInfo") {
         var sqlQuery = "IF NOT EXISTS (SELECT Height FROM BlockInfo WHERE Height = " + toCheck
             + ") INSERT INTO BlockInfo (Height,Timestamp,TransactionCount,Hash,MinerPayoutAddress,MinerArbitraryData,Difficulty,Hashrate,"
@@ -36,7 +36,7 @@ exports.InsertSql= function(params, table, toAdd, toCheck) {
     } else if (table == "HashTypes") {
         var sqlQuery = "IF NOT EXISTS (SELECT Hash FROM HashTypes WHERE Hash = '" + toCheck
             + "') INSERT INTO HashTypes (Hash,Type,MasterHash) VALUES " + toAdd 
-            
+
     } else if (table == "AddressChanges") {
         var sqlQuery = "IF NOT EXISTS (SELECT Address FROM AddressChanges WHERE Address = '" + toCheck
             + "') INSERT INTO AddressChanges (Address,MasterHash,ScChange,SfChange,Height,Timestamp,TxType) VALUES " + toAdd
@@ -81,7 +81,7 @@ exports.InsertSql= function(params, table, toAdd, toCheck) {
 
     } else if (table == "ReviseContract") { // This is not a table, but instead a call to update a current contract
         var sqlQuery = "UPDATE ContractInfo SET " + toAdd + " WHERE ContractId = '" + toCheck + "'"
-    
+
     } else if (table == "UnconfirmedTxs") {
         // Inserts unconfirmed txs. Not necessary to use "if not exists", as it is always an empty table
         var sqlQuery = "INSERT INTO UnconfirmedTxs (TxHash,Timestamp,ScValue,SfValue,TxType) VALUES " + toAdd
@@ -89,7 +89,7 @@ exports.InsertSql= function(params, table, toAdd, toCheck) {
     } else if (table == "UnconfirmedBalances") {
         // Inserts unconfirmed addresses changes. Not necessary to use "if not exists", as it is always an empty table
         var sqlQuery = "INSERT INTO UnconfirmedBalances (Address,TxHash,Timestamp,ScValue,SfValue,TxType) VALUES " + toAdd
-    
+
     } else if (table == "AddressesBalance") {
         var sqlQuery = "IF NOT EXISTS (SELECT Address FROM AddressesBalance WHERE Address = '" + toCheck
             + "') INSERT INTO AddressesBalance (Address, BalanceSc, BalanceSf) VALUES " + toAdd
@@ -108,13 +108,15 @@ exports.InsertSql= function(params, table, toAdd, toCheck) {
 exports.CreateGenesisBalance = function(params, coin, address, value) {
     // Genesis balances
     if (coin == "Sc") { // Siacoins
-        var sqlQuery = "IF NOT EXISTS (SELECT Address FROM AddressesBalance WHERE Address = '" + address
-        + "') INSERT INTO AddressesBalance (Address, BalanceSc, BalanceSf) VALUES ('"
-            + address + "'," + value + ",0)"
+        var sqlQuery = "IF (NOT EXISTS (SELECT Address FROM AddressesBalance WHERE Address = '" + address + "'))"
+        + " BEGIN INSERT INTO AddressesBalance (Address, BalanceSc) VALUES ('" + address + "'," + value + ")"
+        + " END ELSE BEGIN"
+        + " UPDATE AddressesBalance SET BalanceSc = " + value + " WHERE Address = '" + address + "' END"
     } else { // Siafunds
-        var sqlQuery = "IF NOT EXISTS (SELECT Address FROM AddressesBalance WHERE Address = '" + address
-        + "') INSERT INTO AddressesBalance (Address, BalanceSc, BalanceSf) VALUES ('"
-        + address + "',0," + value + ")"
+        var sqlQuery = "IF (NOT EXISTS (SELECT Address FROM AddressesBalance WHERE Address = '" + address + "'))"
+        + " BEGIN INSERT INTO AddressesBalance (Address, BalanceSf) VALUES ('" + address + "'," + value + ")"
+        + " END ELSE BEGIN"
+        + " UPDATE AddressesBalance SET BalanceSf = " + value + " WHERE Address = '" + address + "' END"
     }
     if (params.useMsSqlServer == false) {
         // Adapting the syntax to particularities of SQLite
@@ -129,7 +131,7 @@ exports.CreateOutput = function(params, table, outputId, value, address, block) 
         + " BEGIN INSERT INTO Outputs (OutputId,ScValue,Address,CreatedOnBlock) VALUES ('" + outputId + "'," + value + ",'" + address + "'," + block + ")"
         + " END ELSE BEGIN"
         + " UPDATE Outputs SET ScValue = " + value + ", Address = '" + address  + "', CreatedOnBlock = " + block + " WHERE OutputId ='" + outputId + "' END"
-    
+
     } else if (table == "Outputs-SF") {
         var sqlQuery = "IF (NOT EXISTS(SELECT * FROM Outputs WHERE OutputId='" + outputId + "'))"
         + " BEGIN INSERT INTO Outputs (OutputId,SfValue,Address,CreatedOnBlock) VALUES ('" + outputId + "'," + value + ",'" + address + "'," + block + ")"
@@ -147,7 +149,7 @@ exports.CreateOutput = function(params, table, outputId, value, address, block) 
 
 exports.UpdateOutput = function(params, outputId, block) {
     // Creates an SQL sentence for updating an output as spent. If no entry is found, it creates a new one already spent
-    
+
     // var sqlQuery = "UPDATE Outputs SET Spent = 1, SpentOnBlock = " + block
     //     + " WHERE OutputId ='" + outputId + "'"
     //     + " IF @@ROWCOUNT=0 INSERT INTO Outputs (OutputId,Spent,SpentOnBlock)"
@@ -180,7 +182,7 @@ exports.InsertAlreadySpentOutput = function(params, outputId, block, value, addr
             + "') INSERT INTO Outputs (OutputId,SfValue,Address,CreatedOnBlock,Spent,SpentOnBlock)"
             + " VALUES ('" + outputId + "'," + value + ",'" + address + "'," + block + ",1," + block + ")"
     }
-    
+
     // Adapting the syntax to particularities of SQLite
     if (params.useMsSqlServer == false) {
         sqlQuery = SqlComposer.SqLiteAdapter(sqlQuery)
@@ -192,7 +194,7 @@ exports.InsertAlreadySpentOutput = function(params, outputId, block, value, addr
 
 exports.SqLiteAdapter = function (sqlQuery) {
     // Adapts an SQL query to SQLite syntax
-    
+
     // varchar(max) --> varchar(1000)
     sqlQuery = sqlQuery.replace(/max/g, "1000")
 
@@ -207,7 +209,7 @@ exports.SqLiteAdapter = function (sqlQuery) {
         var w = sqlQuery.search("WHERE");
         var eq = sqlQuery.search("=");
         adaptedQuery = adaptedQuery + sqlQuery.slice(w + 6, eq) + ") DO UPDATE "
-        
+
         var slice = sqlQuery.slice(e)
         var s = slice.search("SET");
         var w2 = slice.search("WHERE");
@@ -259,6 +261,28 @@ exports.InsertReorg = function(params, block, reorgEventNum) {
     var sqlQuery = "INSERT INTO Reorgs (Hash,MiningPool,MiningAddress,Height,ReorgEventNum,DetectionTimestamp,ReplacingHash,ReplacingMiningPool,ReplacingMiningAddress)"
         + " VALUES ('" + block.hash + "','" + block.miningPool + "','" + block.miningAddress + "'," + block.height + "," + reorgEventNum 
         + "," + timestamp + ",'" + block.replacingHash + "','" + block.replacingPool + "','" + block.replacingMiningAddress + "')"
+
+    return sqlQuery
+}
+
+exports.SelectTopSCP = function(params, maxEntries) {
+    // Query db and get the records
+    // scp results, sorted by most to least
+    if (params.useMsSqlServer == true) {
+        // MS SQL Server syntax
+        sqlQuery = "SELECT TOP("+ maxEntries +") Address as address, sum(BalanceSc) as scp FROM AddressesBalance GROUP BY address ORDER BY scp DESC"
+    }
+
+    return sqlQuery
+}
+
+exports.SelectTopSPF = function(params, maxEntries) {
+    // Query db and get the records
+    // spf results, sorted by most to least
+    if (params.useMsSqlServer == true) {
+        // MS SQL Server syntax
+        sqlQuery = "SELECT Top("+ maxEntries +") Address as address, sum(BalanceSf) as spf FROM AddressesBalance GROUP BY address ORDER BY spf DESC"
+    }
 
     return sqlQuery
 }

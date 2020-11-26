@@ -28,7 +28,7 @@ exports.MetadataBlock = async function(params, api) {
     try {
         var prevFeeCount = BigInt(prevBlock.FeeCountHastings)
     } catch (e) {
-        var prevFeeCount = BigInt(prevBlock.FeeCount * 1000000000000000000000000)
+        var prevFeeCount = BigInt(prevBlock.FeeCount * 1000000000000000000000000000)
     }
 
     var metadata = {
@@ -53,7 +53,7 @@ exports.MetadataBlock = async function(params, api) {
         NewContracts: 0
     }
     // Adding the Fee count noted in SC, for code compatibility
-    metadata.FeeCount = Math.round(Number(metadata.FeeCountHastings) / 1000000000000000000000000)
+    metadata.FeeCount = Math.round(Number(metadata.FeeCountHastings) / 1000000000000000000000000000)
 
     // Transactions iterator
     for (var i = 0; i < api.transactions.length; i++) {
@@ -97,13 +97,15 @@ exports.MetadataBlock = async function(params, api) {
 
 function blockReward(params, height) {
     // Calculates the block reward
-    var decay = (BigInt(height) * params.blockchain.decayBlockReward)
-    var reward = params.blockchain.initialBlockReward - decay
-    if (reward < params.blockchain.endBlockReward) {
-        reward = params.blockchain.endBlockReward
-    }
+    if (height == 0) { var reward = 0}
+    else {
+    	var decay = (BigInt(height) * params.blockchain.decayBlockReward)
+    	var reward = params.blockchain.initialBlockReward - decay
+    	if (reward < params.blockchain.endBlockReward) {
+       		reward = params.blockchain.endBlockReward
+    }}
     return reward
-    
+
 }
 
 function newFees(params, api) {
@@ -150,7 +152,7 @@ async function hashrateEstimation(params, height, timestamp, currentDifficulty) 
         // During debugging, we might not have collected previous blocks, so we just set hashrate as 0
         var hashrate = 0
     }
-    
+
     return hashrate
 }
 
@@ -161,7 +163,7 @@ exports.MetadataGenesis = async function(params, api) {
         Difficulty: params.blockchain.genesisDifficulty,
         Hashrate: params.blockchain.genesisHashrate,
         TransactionCount: 0,
-        TotalCoins: params.blockchain.initialBlockReward,
+        TotalCoins: params.blockchain.premine,
         SiacoinInputCount: 0,
         SiacoinOutputCount: 0,
         FileContractRevisionCount: 0,

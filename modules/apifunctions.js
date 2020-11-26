@@ -11,6 +11,46 @@ var Commons = require('./commons.js')
 // Functions for API routes
 // ========================
 
+// Cam's richlist function
+exports.RichList = async function(params, res, req){
+    var initialTime = new Date();
+    var scprimecoinprecision = 1000000000000000000000000000
+    // if request url is richlist/scp
+    if (req.params.v == "scp") {
+        var sqlQuery = "SELECT TOP(25) Address as address, sum(BalanceSc) as scp FROM AddressesBalance GROUP BY address ORDER BY scp DESC"
+    }
+    // if request url is richlist/spf
+    if (req.params.v == "spf") {
+        var sqlQuery = "SELECT TOP(25) Address as address, sum(BalanceSf) as spf FROM AddressesBalance GROUP BY address ORDER BY spf DESC"
+    }
+    // Database search
+    var recordSet = await SqlAsync.Sql(params, sqlQuery)
+    var resJson = []
+    for (x = 0; x<recordSet.length; x++) {
+        // probably an easier way to do this, like with .map or something. for now this works - cam
+        if (req.params.v == "scp") {
+            // convert hastings to scp
+            var convertedFunds = recordSet[x].scp/scprimecoinprecision
+            resJson.push({
+                "address": recordSet[x].address,
+                "scp": convertedFunds
+            });
+        }
+        if (req.params.v == "spf"){
+            resJson.push({
+                "address": recordSet[x].address,
+                "spf": recordSet[x].spf
+            });
+        }
+    }
+    // API response and logging
+    res.send(resJson);
+    if (params.verboseApiLogs == true){
+        timeDelta = new Date() - initialTime
+        console.log("GET: " + req.params.v + " richlist - " + timeDelta + "ms")
+    }
+}
+
 // Search by hash
 exports.Hash = async function(params, res, req) {
     var initialTime = new Date();
@@ -24,7 +64,7 @@ exports.Hash = async function(params, res, req) {
     var recordset = await SqlAsync.Sql(params, sqlQuery)
     var hashType 
     if (recordset.length != 0) { // Only if something was found in the query
-        
+
         var hashType = recordset[0].Type
         var masterHash = recordset[0].Masterhash
         if (masterHash == "" || masterHash == null 
@@ -42,7 +82,7 @@ exports.Hash = async function(params, res, req) {
         // B1 - Next search: AddressesChanges
         var sqlQuery = "SELECT DISTINCT MasterHash,ScChange,SfChange,Height,Timestamp,TxType FROM AddressChanges WHERE Address = '" +  hashReq + "'"
         var recordset = await SqlAsync.Sql(params, sqlQuery)
-        
+
         // Balances, sent/received amounts and number of transactions
         var txCount = recordset.length
         var balanceSc = 0
@@ -74,7 +114,7 @@ exports.Hash = async function(params, res, req) {
         }
 
         // Unconfirmed transactions
-        var sqlQuery = "SELECT ScValue,SfValue,TxType,Timestamp,TxHash FROM UnconfirmedBalances WHERE Address = '" + hashReq + "'"
+        var sqlQuery = "SELECT ScValue,SfValue,TxType,Timestamp, TxHash FROM UnconfirmedBalances WHERE Address = '" + hashReq + "'"
         var recordsetUnconfirmed = await SqlAsync.Sql(params, sqlQuery)
         var pendingSc = 0
         var pendingSf = 0
@@ -82,7 +122,7 @@ exports.Hash = async function(params, res, req) {
         for (var i = 0; i < recordsetUnconfirmed.length; i++) {
             pendingSc = pendingSc + recordsetUnconfirmed[i].ScValue
             pendingSf = pendingSf + recordsetUnconfirmed[i].SfValue
-            
+        
             // Merging outputs from the same TxHash in a new array
             var alreadyIncluded = false
             for (var j = 0; j < dedupUnconfirmed.length; j++) {
@@ -113,7 +153,7 @@ exports.Hash = async function(params, res, req) {
             "unconfirmedTransactions": dedupUnconfirmed
         }
         resJson.push(addressResponse)
-    
+
     // OUTPUT
     } else if (hashType == "output") { 
         // C1 - Next search: Outputs
@@ -142,10 +182,10 @@ exports.Hash = async function(params, res, req) {
     // SIMPLE TRANSACTIONS
     } else if (hashType == "ScTx" || hashType == "SfTx" || hashType == "blockreward" || hashType == "allowancePost" 
         || hashType == "collateralPost") {
-        
+
         // Some TX don't have masterHash, default instead to the user request
         if (masterHash == null || masterHash == "") {masterHash = req.params.hash_id}
-        
+
         // D1 - Next search: Transaction info
         var sqlQuery = "SELECT HashSynonyms,Height,Timestamp,Fees from TxInfo WHERE TxHash = '" +  masterHash + "'"
         var recordset = await SqlAsync.Sql(params, sqlQuery)
@@ -158,7 +198,7 @@ exports.Hash = async function(params, res, req) {
         // D2 - Next search: Changes in balance
         var sqlQuery = "SELECT DISTINCT Address,ScChange,SfChange,TxType from AddressChanges WHERE MasterHash = '" +  masterHash + "'"
         var recordset = await SqlAsync.Sql(params, sqlQuery)
-        
+
         // We need to discard the negative changes that are related to contract formations (allowanceposting and collateralposting),
         // as concatenated transactions with contracts can create weird display bugs on the amounts scheme (an intermediate address than is later
         // used for collateral // allowance posting)
@@ -277,7 +317,7 @@ exports.Hash = async function(params, res, req) {
         var sqlQuery = "SELECT DISTINCT Address,ScChange,SfChange from AddressChanges WHERE MasterHash = '" +  masterHash + "'"
         var recordset = await SqlAsync.Sql(params, sqlQuery)
         resJson.push({"transactions": recordset})
-    
+
     // MALFORMED REQUEST
     } else if (hashReq == null) {
         // Nothing
@@ -288,7 +328,7 @@ exports.Hash = async function(params, res, req) {
         if (hashReq.length == 64) {
             // Check the mempool for unconfirmed TX
             resJson = await searchMempool(params, hashReq, resJson)
-        
+
         } else if (hashReq.length == 76) {
             // Unconfirmed addresses
             resJson = await searchUnconfirmed(params, hashReq, resJson)
@@ -307,7 +347,7 @@ exports.Hash = async function(params, res, req) {
 // Unspent outputs of a given address
 exports.UnspentOutputs = async function(params, res, req) {
     var initialTime = new Date();
-    
+
     // Checking the sanity of the request to avoid SQL injections
     var hash = sanitySql(req.params.hash_id)
 
@@ -315,7 +355,7 @@ exports.UnspentOutputs = async function(params, res, req) {
         || hash == "000000000000000000000000000000000000000000000000000000000000000089eb0d6a8a69" ) {
         // Bad request, or the burning address (unnecesary tedious search that could be used for an attack), or bad length
         res.status(400).send('Wrong hash format')
-    
+
     } else {
         // Database search
         var sqlQuery = "SELECT DISTINCT OutputId, ScValue, SfValue from Outputs WHERE Address = '" +  hash + "' AND Spent IS null"
@@ -335,7 +375,7 @@ exports.UnspentOutputs = async function(params, res, req) {
                 "sf": recordset[i].SfValue
             })
         }
-        
+
         // API response and logging
         res.send(resJson);
         if (params.verboseApiLogs == true) {
@@ -349,7 +389,7 @@ exports.UnspentOutputs = async function(params, res, req) {
 // Raw call to the explorer module
 exports.Raw = async function(params, res, req) {
     var initialTime = new Date();
-    
+
     // Checking the sanity of the request to avoid SQL injections
     var hash = sanitySql(req.params.hash_id)
 
@@ -381,10 +421,10 @@ exports.AddressesBatch = async function(params, res, req) {
 
     // Splits the string into an array of addresses
     addressesArray = addresses.match(/[^\r\n]+/g)
-    
+
     // Limit to the batch limit of addresses
     addresses = addressesArray.splice(0, params.apiBatchLimit)
-    
+
     // Sanitizing request
     var sanitizedAddresses = []
     for (var i = 0; i < addresses.length; i++) {
@@ -418,7 +458,7 @@ exports.AddressesBatch = async function(params, res, req) {
 
         // Async call
         var result = await SqlAsync.Sql(params, sqlQuery)
-        
+
         // Concatenating results to a single array
         recordSet = recordSet.concat(result)
     }
@@ -476,7 +516,7 @@ exports.AddressesBatch = async function(params, res, req) {
         }
     }
     var txCount = newTxs.length
-                
+
     // 5 - Order by heigt and send only 100 transactions, according to the page
     newTxs.sort(function(a,b) {
         return parseFloat(b.Height) - parseFloat(a.Height)
@@ -498,7 +538,7 @@ exports.AddressesBatch = async function(params, res, req) {
         "page": page})
     addressResponse.push({"addresses": addressesBalance})
     addressResponse.push({"last100Transactions": trimTxs})
-    
+
     // Send response and log
     res.json(addressResponse);
     if (params.verboseApiLogs == true) {
@@ -512,7 +552,7 @@ exports.AddressesBatch = async function(params, res, req) {
 exports.ContractsBatch = async function(params, res, req) {
     var initialTime = new Date();
     var file = req.body.query;  
-    
+
     var processedArray = preprocessHostFile(file)
 
     // Limit to batch limit of contracts
@@ -551,7 +591,7 @@ exports.ContractsBatch = async function(params, res, req) {
 
         // Async call
         var result = await SqlAsync.Sql(params, sqlQuery)
-        
+
         // Concatenating results to a single array
         recordSet = recordSet.concat(result)
     }
@@ -628,7 +668,7 @@ exports.ContractsBatch = async function(params, res, req) {
         "revenuegain": revenueGain, "revenuelost": revenueLost, "revenuenet": revenueNet})
     contractsResponse.push({"contracts": contractsArray})
     contractsResponse.push({"contractsNotFound": contractsNotFound})
-    
+
     // Send response and log
     res.json(contractsResponse);
     if (params.verboseApiLogs == true) {
@@ -671,7 +711,7 @@ exports.CsvFile = async function(params, res, req) {
         var day = date.getDate();
         if (day < 10) {day = "0" + day}
         var humanTimestamp = year + "-" + month + "-" + day
-        
+
         // Finding exchange rate, only for txs that change the balance of SC (not SFs)
         var exchangePrice = "-" // The SC rate
         var sfExchangePrice = "-" // The SF rate
@@ -680,7 +720,7 @@ exports.CsvFile = async function(params, res, req) {
         var exangedCurrencySf = "-"
         var correctedAmount = 0 // from Hastings to SC
 
-        correctedAmount = newTxs[i].ScChange / 1000000000000000000000000
+        correctedAmount = newTxs[i].ScChange / 1000000000000000000000000000
         for (var j = 0; j < exRates.length; j++) {
             if (correctedTimestamp == exRates[j].Timestamp) {
                 exchangePrice = exRates[j][currency]
@@ -701,7 +741,7 @@ exports.CsvFile = async function(params, res, req) {
                 }
             }
         }
-        
+
         // If the entry is from the last 24 hours, and has no assigned value, use the latest entry of the database
         if ((now - 86400) < newTxs[i].Timestamp && exchangePrice == "-" && ((newTxs[i].ScChange > 0 || newTxs[i].ScChange < 0))) {
             exchangePrice = exRates[exRates.length-1][currency]
@@ -728,7 +768,7 @@ exports.CsvFile = async function(params, res, req) {
         if (balanceSc > 0) {} else {balanceSc = 0}
         if (balanceSf > 0) {} else {balanceSf = 0}
         var balanceTotal = balanceSc + balanceSf
-        
+
 
         // Pushing to array
         csvArray.push({
@@ -794,7 +834,7 @@ exports.CsvFile = async function(params, res, req) {
             return result;
         }
         var fileId = makeid(10)
-        
+
         // Save the file
         var filePath = params.websitePath + "csv_reports/" + fileId + ".csv"
         fs.writeFileSync(filePath, csv)
@@ -848,7 +888,7 @@ exports.BalanceTrack = async function(params, res, req) {
     for (var i = 0; i < txs.length; i++) {
         // Finding the position in the array according to the timestamp
         var pos = Math.floor((txs[i].Timestamp - firstTrade) / 86400)
-        balances[pos].sc = balances[pos].sc + (txs[i].ScChange/1000000000000000000000000)
+        balances[pos].sc = balances[pos].sc + (txs[i].ScChange/1000000000000000000000000000)
         balances[pos].sf = balances[pos].sf + txs[i].SfChange
     }
 
@@ -929,7 +969,7 @@ exports.Qr = async function(params, res, req) {
                 light: params.colors.qrCode
             }
         }
-    
+
         qrcode.toString(hashReq, qrOptions, function (err, url) {
             res.status(200, "image/svg+xml").send(url)   
         })
@@ -960,7 +1000,7 @@ exports.Reorgs = async function(params, res, req) {
                 eventNum: i,
                 blocks: []
             })
-            
+
             for (var j = 0; j < sqlReorgs.length; j++) {
                 if (sqlReorgs[j].ReorgEventNum == i) {
                     reorgs[reorgs.length-1].timestamp = sqlReorgs[j].DetectionTimestamp
@@ -995,7 +1035,6 @@ exports.TotalCoins = async function(params, res, req) {
         res.status(404).send()
     }
 }
-
 
 // ============================
 // Common methods and functions
@@ -1033,7 +1072,7 @@ async function searchUnconfirmed(params, hashReq, resJson) {
             }
         ]
     }
-    
+
     return resJson
 }
 
@@ -1048,7 +1087,7 @@ async function searchMempool(params, hashReq, resJson) {
             "Type": "unconfirmed",
             "MasterHash": hashReq
         }]
-    
+
     } else {
         // Id there is an error from this call, the TX does not exist on the mempool
         // However, during a few seconds, the TX may be not in the mempool once integrated on a block but not yet on my SQL database, so I
@@ -1062,7 +1101,7 @@ async function searchMempool(params, hashReq, resJson) {
             }]
         }
     }
-    
+
     return resJson
 }
 
@@ -1086,7 +1125,7 @@ function sanitySql(hash) {
     if (sanityOk == false) {
         hash = null
     }
-    
+
     return hash
 }
 
@@ -1096,7 +1135,7 @@ async function getAddressesBatchTxs(params, addresses) {
 
     // Limit to the batch limit number of addresses addresses
     addresses = addresses.splice(0, params.apiBatchLimit)
-    
+
     // Sanitizing request
     var sanitizedAddresses = []
     for (var i = 0; i < addresses.length; i++) {
@@ -1129,7 +1168,7 @@ async function getAddressesBatchTxs(params, addresses) {
 
         // Async call
         var result = await SqlAsync.Sql(params, sqlQuery)
-        
+
         // Concatenating results to a single array
         recordSet = recordSet.concat(result)
     }
@@ -1150,12 +1189,12 @@ async function getAddressesBatchTxs(params, addresses) {
             newTxs.push(txs[n])
         }  
     }
-    
+
     // B - Order by height
     newTxs.sort(function(a,b) {
         return parseFloat(a.Height) - parseFloat(b.Height)
     })
-    
+
     return newTxs
 }
 
@@ -1179,4 +1218,4 @@ function preprocessHostFile(file) {
     }
 
     return processedArray
-}
+} 

@@ -1,10 +1,10 @@
 var theme = {
-	accent: '#1a874b',
-	accentFaded1: '#49664e',
-	accentFaded2: '#427c4b',
-	decoration: '#7e9489',
-	decorationSubtle: '#3e664e',
-	decorationContrast: '#9eb4a9',
+	accent: '#307fe2',
+	accentFaded1: '#5483be',
+	accentFaded2: '#4281d0',
+	decoration: '#86b4ee',
+	decorationSubtle: '#16519a',
+	decorationContrast: '#a8c9f3',
 	background: '#2b2f2d',
 	green: '#5cae81',
 	darkGreen: '#2ba84b',
@@ -25,8 +25,8 @@ var theme = {
 }
 var htmlPath = ''
 var landingRefreshPeriod = 15000
-var donationAddress = 'bde3467039a6d9a563224330ff7578a027205f1f2738e1e0daf134d8ded1878cf5870c41927d'
-var githubRepository = 'https://github.com/hakkane84/navigator-sia'
+var donationAddress = 'e52092ada56c4db04c093629010d8fb57ef6d885b70fe13d6dee55d73b865a5dd232ea235787'
+var githubRepository = 'https://github.com/420coupe/navigator-scp'
 var useCoinGeckoPrices = true
 // INJECTION POINT *************************************************************
 // Important: Do not edit or delete the line above
@@ -64,7 +64,7 @@ function openTab(evt, cityName) {
 
 
 // Handling POST requests
-    
+
     // HOST CONTRACTS BATCH SEARCH
     $("button[name = 'hostContracts']").click(function(){
         // Hiding elements
@@ -143,15 +143,15 @@ function openTab(evt, cityName) {
                             + '</tr>'
                             + '<tr>'
                                 + '<td style="height: 40px; padding: 0px 15px; font-size:100%; vertical-align:center;"> Net revenue from succeeded contracts</td>'
-                                + '<td style="height: 40px; padding: 0px 15px; font-size:100%; vertical-align:center; text-align: right">' + readable(data[0].revenuegain) + ' SC</td>'
+                                + '<td style="height: 40px; padding: 0px 15px; font-size:100%; vertical-align:center; text-align: right">' + readable(data[0].revenuegain) + ' SCP</td>'
                             + '</tr>'
                             + '<tr>'
                                 + '<td style="height: 40px; padding: 0px 15px; font-size:100%; vertical-align:center;"> Lost from failed contracts</td>'
-                                + '<td style="height: 40px; padding: 0px 15px; font-size:100%; vertical-align:center; text-align: right">' + readable(data[0].revenuelost) + ' SC</td>'
+                                + '<td style="height: 40px; padding: 0px 15px; font-size:100%; vertical-align:center; text-align: right">' + readable(data[0].revenuelost) + ' SCP</td>'
                             + '</tr>'
                             + '<tr>'
                                 + '<td style="height: 40px; padding: 0px 15px; font-size:100%; vertical-align:center;"> Total net revenue</td>'
-                                + '<td style="height: 40px; padding: 0px 15px; font-size:100%; vertical-align:center; text-align: right">' + readable(data[0].revenuenet) + ' SC</td>'
+                                + '<td style="height: 40px; padding: 0px 15px; font-size:100%; vertical-align:center; text-align: right">' + readable(data[0].revenuenet) + ' SCP</td>'
                             + '</tr>'
                         + '</thead>'
                     + '</table>'
@@ -163,12 +163,12 @@ function openTab(evt, cityName) {
                 + '</div>'
             + '</div>'
         + '</div>'
-            
+
         document.getElementById('content5').innerHTML = tableCode
         document.getElementById("content5").style.display = 'block'
 
         renderHostChart(data)
-        
+
     }
 
     function renderHostChart(data) {
@@ -244,7 +244,7 @@ function openTab(evt, cityName) {
             + '</div>'
         document.getElementById('content6').appendChild(div);
         document.getElementById("content6").style.display = 'block'
-        
+
         // Google charts timeline
         google.charts.load('current', {'packages':['timeline']});
         google.charts.setOnLoadCallback(drawChart);
@@ -271,9 +271,9 @@ function openTab(evt, cityName) {
                 var contractEnd = new Date(contractEndPre * 1000)
                 var row = ["c" + i, c.contractId, customHTMLTooltip(c, newColor), contractStart, contractEnd]
                 array.push(row)
-                
+
             }
-            
+
             //Rendering
             var container = document.getElementById('timeline');
             document.getElementById('content6').appendChild(div);
@@ -285,7 +285,7 @@ function openTab(evt, cityName) {
             dataTable.addColumn({ type: 'string', role: 'tooltip', p: {'html': true}});
             dataTable.addColumn({ type: 'date', id: 'Start' });
             dataTable.addColumn({ type: 'date', id: 'End' });
-            
+
             dataTable.addRows(array)
 
             var options = {
@@ -298,7 +298,7 @@ function openTab(evt, cityName) {
                 tooltip: { isHtml: true },
                 backgroundColor: theme.tableBorders,
             };
-            
+
             // This block of code changes the color of the time axis labels
             google.visualization.events.addListener(chart, 'ready', function () {
                 var labels = container.getElementsByTagName('text');
@@ -365,11 +365,11 @@ function openTab(evt, cityName) {
             // Box for requesting to download a CSV of the transactions
             var addresses = query.replace(/\n/g, ',');
             var addressesArray = addresses.split(",");
-            
+
             if (useCoinGeckoPrices == true) {
                 renderCsvDownloadBox(addressesArray, "content5")
             }
-            
+
             renderWalletTxs(data)
 
             document.getElementById("loader").style.display = 'none'
@@ -392,14 +392,14 @@ function openTab(evt, cityName) {
                                 + '</th>'
                             + '</tr>'
                             + '<tr>'
-                                + '<td style="height: 60px; padding: 0px 15px; font-size:110%; vertical-align:center;">Confirmed Siacoin balance: </td>'
-                                + '<td style="height: 60px; padding: 0px 15px; font-size:110%; vertical-align:center; text-align: right">' + readable(data[0].balanceSc) + ' SC'
-                                    + '<br><span style="font-size: 12px">' + readable(data[0].receivedSc) + ' SC received / -' + readable(data[0].sentSc) + ' SC sent</span>'
+                                + '<td style="height: 60px; padding: 0px 15px; font-size:110%; vertical-align:center;">Confirmed Scprime balance: </td>'
+                                + '<td style="height: 60px; padding: 0px 15px; font-size:110%; vertical-align:center; text-align: right">' + readable(data[0].balanceSc) + ' SCP'
+                                    + '<br><span style="font-size: 12px">' + readable(data[0].receivedSc) + ' SCP received / -' + readable(data[0].sentSc) + ' SCP sent</span>'
                                 + '</td>'
                             + '</tr>'
                             + '<tr>'
-                                + '<td style="height: 45px; padding: 0px 15px; font-size:110%; vertical-align:center;">Confirmed Siafund balance: </td>'
-                                + '<td style="height: 45px; padding: 0px 15px; font-size:110%; vertical-align:center; text-align: right">' + data[0].balanceSf + ' SF</td>'
+                                + '<td style="height: 45px; padding: 0px 15px; font-size:110%; vertical-align:center;">Confirmed Scpfund balance: </td>'
+                                + '<td style="height: 45px; padding: 0px 15px; font-size:110%; vertical-align:center; text-align: right">' + data[0].balanceSf + ' SPF</td>'
                             + '</tr>'
                             + '<tr>'
                                 + '<td style="height: 45px; padding: 0px 15px; font-size:110%; vertical-align:center;">Number of transactions: </td>'
@@ -418,7 +418,7 @@ function openTab(evt, cityName) {
         + '<div class="disclaimer">'
             + '<span style=""><i>The information shown is orientative and should not be considered more reliable than the information provided by the wallet UI. Bugs in Navigator or an out-of-date list of addresses could provoke a few transactions to be missing and affect the shown balance.'
             + '<a href="about" style="display:block; color:inherit; text-decoration: underline;">Check About for contact info</a></i></span></div>'
-                
+
         document.getElementById('content5').innerHTML = tableCode
         document.getElementById("content5").style.display = 'block'  
     }
@@ -452,10 +452,10 @@ function openTab(evt, cityName) {
                     + '<td style="font-size:small; border-right: 0px"><a href=' + htmlPath + '?search=' + positiveAddresses[n].address + '>'
                         + shortHash(positiveAddresses[n].address) + '</a></td>'
                     + '<td style="border-right: 0px; font-weight: 700; font-size:90%; text-align: right">' 
-                        + readable(value) + ' SC / ' + positiveAddresses[n].sf + ' SF</td>'
+                        + readable(value) + ' SCP / ' + positiveAddresses[n].sf + ' SPF</td>'
                 + '</tr>'
         }
-                
+
         // This closes the table
         tableCode = tableCode + '</thead> </table>'
         div.innerHTML = tableCode
@@ -473,7 +473,7 @@ function openTab(evt, cityName) {
 
             var container = "content6"
             renderAddressList(txs, auxblock, container, null)
-            
+
         })
     }
 
@@ -481,17 +481,17 @@ function openTab(evt, cityName) {
     // HASH SEARCH
     var path = apiPath + "/status"
     $.getJSON(path, function(auxblock) {
-        
+
         var qs = window.location.search
         searchQuery = qs.slice(8)
         if (searchQuery.length == 64 || searchQuery.length == 76 || parseInt(searchQuery) >= 0) { // It is a valid hash
             var jsonPath = apiPath + '/hash/' + searchQuery
             $.getJSON(jsonPath, function(data) {
-                
+
                 // Hiding loader
                 document.getElementById("loader").style.display = 'none';
                 document.getElementById("loader3").style.display = 'none';
-                
+
                 if (data != "") { // The api returned something different than an empty array
                     // 1 - The first thing to show is the hash type header
                     document.getElementById("header").style.display = 'block'; 
@@ -515,7 +515,7 @@ function openTab(evt, cityName) {
                         if (useCoinGeckoPrices == true) {
                             renderCsvDownloadBox([searchQuery], "content")
                         }
-                        
+
                         // List of transactions
                         var txs = data[1].last100Transactions
                         var container = 'content2'
@@ -532,7 +532,7 @@ function openTab(evt, cityName) {
                         renderOutputTable(data)
 
                     } else {
-                        
+
                         // Scheme of the transaction
                         renderScheme(data)
 
@@ -546,13 +546,13 @@ function openTab(evt, cityName) {
                         }
                         // Readjsut the widths of all the elements
                         adjustWidth()
-                        
+
                     }
-                    
+
                     //Hidding elements after loading
                     document.getElementById("loader2").style.display = 'none';
-                    
-                    
+
+
                 } else {
                     // Error: hash not found
                     renderError(searchQuery)
@@ -564,7 +564,7 @@ function openTab(evt, cityName) {
             var path = apiPath + "/landing"
             $.getJSON(path, function(landing) { // Loading data
                 renderLandingPage(auxblock, landing)
-                
+
                 // Hiding elements
                 document.getElementById("loader").style.display = 'none';
                 document.getElementById("loader2").style.display = 'none';
@@ -580,7 +580,7 @@ function openTab(evt, cityName) {
             document.getElementById("result").innerHTML = "Invalid search"
 
         }
-        
+
         function renderUnconfirmed() {
             // Renders Unconfirmed message
             document.getElementById("inset").style.display = 'none'
@@ -653,7 +653,7 @@ function openTab(evt, cityName) {
                 for (var i = 0; i < landing.last10ScTx.length; i++) {
                     var link = '<a href=' + htmlPath + '?search=' + landing.last10ScTx[i].TxHash + ' style="display:block; color:' + theme.text + '">'
                     document.getElementById("landingTable2-"+i+"a").innerHTML = '<svg style="width: 25px; height: 25px"><use xlink:href="#sctx-text" class="icon-text"/></svg>'
-                    document.getElementById("landingTable2-"+i+"b").innerHTML = link + "SC Tx" + "</a>"
+                    document.getElementById("landingTable2-"+i+"b").innerHTML = link + "SCP Tx" + "</a>"
                     document.getElementById("landingTable2-"+i+"c").innerHTML = link + "<code>" + miniHash(landing.last10ScTx[i].TxHash) + "</code></a>"
                 }
 
@@ -677,8 +677,23 @@ function openTab(evt, cityName) {
                         + landing.last10Others[i].TxType + '-text" class="icon-text"/></svg>'
                     document.getElementById("landingTable4-"+i+"c").innerHTML = link + "<code>" + miniHash(landing.last10Others[i].TxHash) + "</code></a>"
                 }
+
+                // Last 10 SCP richlist
+                for (var i = 0; i < landing.last10ScpRich.length; i++) {
+                    var scprimecoinprecision = 1000000000000000000000000000
+                    var link = '<a href=' + htmlPath + '?search=' + landing.last10ScpRich[i].address + ' style="display: block, color:' + theme.text + '">'
+                    document.getElementById("landingTable5-"+i+"a").innerHTML = link + "<code>" + miniHash(landing.last10ScpRich[i].address) + "</code></a>"
+                    document.getElementById("landingTable5-"+i+"b").innerHTML = link + (landing.last10ScpRich[i].scp/scprimecoinprecision).toFixed(2) + " SCP </a>"
+                }
+
+                // Last 10 SPF richlist
+                for (var i = 0; i < landing.last10SpfRich.length; i++) {
+                    var link = '<a href=' + htmlPath + '?search=' + landing.last10SpfRich[i].address + ' style="display: block, color:' + theme.text + '">'
+                    document.getElementById("landingTable6-"+i+"a").innerHTML = link + "<code>" + miniHash(landing.last10SpfRich[i].address) + "</code></a>"
+                    document.getElementById("landingTable6-"+i+"b").innerHTML = link + landing.last10SpfRich[i].spf + " SPF </a>"
+                }
             }
-            
+
             adjustWidth()
             refreshLanding(status[0].lastblock, status[0].consensusblock, status[0].mempool, landing)
         }
@@ -695,7 +710,7 @@ function openTab(evt, cityName) {
                         var link = '<a href=' + htmlPath + '?search=' + landing.last10Blocks[i].Height + ' style="display:block; color:' + theme.text + '">'
                         document.getElementById("landingTable1-"+i+"c").innerHTML = link + blocksTime(landing.last10Blocks[i].Timestamp) + "</a>"
                     }
-                    
+
                     $.getJSON(apiPath + "/status", function(status) {
                         if (status[0].lastblock == undefined) {
                             // Error on API. Try again in 3 seconds
@@ -713,8 +728,8 @@ function openTab(evt, cityName) {
                             if (status[0].consensusblock != consensusBlock) {
                                 $("#heightCardHighlight").fadeIn(500).fadeOut(500)
                             }
-                            
-                            
+
+
                             // Check if a new block was added. Reload
                             if (status[0].lastblock != lastBlock) {
                                 $.getJSON(apiPath + "/landing", function(landing) {
@@ -724,7 +739,7 @@ function openTab(evt, cityName) {
                                     if (status[0].lastblock >= 0) {
                                         if (lastBlock == undefined) {lastBlock = status[0].lastblock - 1} // In case of bugged initial file
                                         animateNumber(document.getElementById("statCard2"), lastBlock, status[0].lastblock, animationDuration);
-                                        
+
                                         if (status[0].lastblock < status[0].consensusblock) {
                                             document.getElementById("syncSpinner").innerHTML = "<i class='fa fa-refresh fa-spin' style='color: " 
                                                 + theme.yellow + "' ></i>"
@@ -733,7 +748,7 @@ function openTab(evt, cityName) {
                                                 + theme.accent + "' ></i>"
                                         }
                                     }                             
-                                    
+
                                     // Update the rest after 1 second timeout to complete the animations
                                     setTimeout(function(){
                                         renderLandingPage(status, landing)
@@ -794,15 +809,15 @@ function openTab(evt, cityName) {
             return shortHash
         }
 
-        
+
         function renderHeader(data, searchQuery) {
             // Translating the hash types to legible and rendering the header
             var hashType
             if (data[0].Type == "ScTx") {
-                hashType = "Siacoin transaction"
+                hashType = "Scprime transaction"
                 document.getElementById('header-icon').innerHTML = '<use xlink:href="#sctx-contrast" class="icon-contrast"/>'}
             else if (data[0].Type == "SfTx") {
-                hashType = "Siafund transaction"
+                hashType = "Scprimefund transaction"
                 document.getElementById('header-icon').innerHTML = '<use xlink:href="#sftx-contrast" class="icon-contrast"/>'}
             else if (data[0].Type == "storageproof") {
                 hashType = "Storage Proof"
@@ -845,7 +860,7 @@ function openTab(evt, cityName) {
                 hashType = "Transaction output"
                 document.getElementById('header-icon').innerHTML = '<use xlink:href="#output" class="icon-contrast"/>'
             }
-            
+
             document.getElementById("header2").innerHTML = hashType
             document.getElementById("header3").innerHTML = shortHash(searchQuery)
 
@@ -860,8 +875,8 @@ function openTab(evt, cityName) {
                 } else {
                     var confirmationsNum = auxblock[0].consensusblock - data[1].Height + 1
                 }
-                
-                
+
+
                 if (confirmationsNum > 72) {confirmationsNum = "72+"}
                 document.getElementById("header4").innerHTML = confirmationsNum + " confirmations"
                 if (confirmationsNum >= 10 && confirmationsNum < 72) {
@@ -893,17 +908,17 @@ function openTab(evt, cityName) {
                     var linkInBox = htmlPath + "?search=" + data[2].transactions[n].Address
                     // Color of value change. By default red, in SF orange
                     var colorInBox = theme.brightRed
-                    
+
                     // Identifying senders
                     if (data[2].transactions[n].ScChange < 0 || data[2].transactions[n].SfChange < 0) {
-                        
+
                         if (data[2].transactions[n].ScChange < 0) {
                             var valueInBox = data[2].transactions[n].ScChange // Push the change in SC
-                            valueInBox = readable(valueInBox) + " SC"
+                            valueInBox = readable(valueInBox) + " SCP"
                         } else if (data[2].transactions[n].SfChange < 0) {
-                            var valueInBox = data[2].transactions[n].SfChange + " SF" // Push the change in SF
+                            var valueInBox = data[2].transactions[n].SfChange + " SPF" // Push the change in SF
                         }
-                        
+
                         // Naming the sending object
                         if (data[0].Type == "ScTx" || data[0].Type == "SfTx") {var objectInBox = "Sender address"}
                         else if (data[0].Type == "host ann") {var objectInBox = "Host address"}
@@ -934,7 +949,7 @@ function openTab(evt, cityName) {
                 var iconInBox = "contract"
                 var contractInBox = shortHash(data[1].ContractId)
                 var linkInBox = htmlPath + "?search=" + data[1].ContractId
-                var valueInBox = readable(data[1].Output0Value + data[1].Output1Value + data[1].Output2Value) + " SC"
+                var valueInBox = readable(data[1].Output0Value + data[1].Output1Value + data[1].Output2Value) + " SCP"
                 addRowSender(objectInBox, linkInBox, contractInBox, valueInBox, iconInBox, colorInBox)
             }
 
@@ -944,14 +959,14 @@ function openTab(evt, cityName) {
                 var iconInBox = "allowance"
                 var addressInBox = shortHash(data[1].AllowancePosting)
                 var linkInBox = htmlPath + "?search=" + data[1].AllowancePosting
-                var valueInBox = "- " + readable(data[1].RenterValue) + " SC"
+                var valueInBox = "- " + readable(data[1].RenterValue) + " SCP"
                 addRowSender(objectInBox, linkInBox, addressInBox, valueInBox, iconInBox, colorInBox)
-                
+
                 var objectInBox2 = "Host: collateral posting hash"
                 var iconInBox2 = "collateral"
                 var addressInBox2 = shortHash(data[1].CollateralPosting)
                 var linkInBox2 = htmlPath + "?search=" + data[1].CollateralPosting
-                var valueInBox2 = "- " + readable(data[1].HostValue) + " SC"
+                var valueInBox2 = "- " + readable(data[1].HostValue) + " SCP"
                 addRowSender(objectInBox2, linkInBox2, addressInBox2, valueInBox2, iconInBox2, colorInBox)
             }
 
@@ -962,12 +977,12 @@ function openTab(evt, cityName) {
                 var iconInBox = "network"
                 var linkInBox = ""
                 var sizeInBox = 4
-                var subsidy =  300000 - data[1].Height
-                if (subsidy < 30000) {subsidy = 30000} // Minimal future subsidy
-                subsidyReadable = readable(subsidy * 1000000000000000000000000) + " SC"
+                var subsidy =  300 - (data[1].Height/1000)
+                if (subsidy < 10) {subsidy = 10} // Minimal future subsidy
+                subsidyReadable = readable(subsidy * 1000000000000000000000000000) + " SCP"
                 addSimpleSenderBox(objectInBox, subsidyReadable, colorInBox, iconInBox, linkInBox, sizeInBox)
-                
-                var minedFees = readable(data[2].transactions[0].ScChange - (subsidy * 1000000000000000000000000)) + " SC"
+
+                var minedFees = readable(data[2].transactions[0].ScChange - (subsidy * 1000000000000000000000000000)) + " SCP"
                 var objectInBox = "Collected transaction fees"
                 addSimpleSenderBox(objectInBox, minedFees, colorInBox, iconInBox, linkInBox, sizeInBox)
             }
@@ -987,21 +1002,21 @@ function openTab(evt, cityName) {
                         var addressInBox = shortHash(data[1].HashSynonyms)
                         var linkInBox = htmlPath + "?search=" +data[1].HashSynonyms
                     }
-                    
+
                     // Identifying receivers
                     if (data[2].transactions[n].ScChange > 0 || data[2].transactions[n].SfChange > 0) {
                         if (data[2].transactions[n].ScChange > 0) {
                             var valueInBox = data[2].transactions[n].ScChange // Push the change in SC
-                            valueInBox = readable(valueInBox) + " SC"
+                            valueInBox = readable(valueInBox) + " SCP"
                         } else if (data[2].transactions[n].SfChange > 0) {
-                            var valueInBox = data[2].transactions[n].SfChange + " SF" // Push the change in SF
+                            var valueInBox = data[2].transactions[n].SfChange + " SPF" // Push the change in SF
                         }
 
                         // Naming the receiving object
                         if (data[0].Type == "ScTx") {var objectInBox = "Receiver address"}
                         else if (data[0].Type == "SfTx" && data[2].transactions[n].TxType != "SfClaim" && data[2].transactions[n].SfChange > 0) {var objectInBox = "Receiver address"}
                         else if (data[0].Type == "SfTx" && data[2].transactions[n].TxType != "SfClaim" && data[2].transactions[n].ScChange > 0) {var objectInBox = "Sender wallet return (unspent output)"}
-                        else if (data[0].Type == "SfTx" && data[2].transactions[n].TxType == "SfClaim") {var objectInBox = "SiaFund dividend claim address (sender)"}
+                        else if (data[0].Type == "SfTx" && data[2].transactions[n].TxType == "SfClaim") {var objectInBox = "ScpFund dividend claim address (sender)"}
                         else if (data[0].Type == "host ann") {var objectInBox = "Host address"}
                         else if (data[0].Type == "allowancePost" && data[2].transactions[n].TxType != "contractform") {var objectInBox = "Renter address"}
                         else if (data[0].Type == "allowancePost" && data[2].transactions[n].TxType == "contractform") {var objectInBox = "Allowance for Contract ID"}
@@ -1043,7 +1058,7 @@ function openTab(evt, cityName) {
                 var sizeInBox = 4
                 addSimpleBox(objectInBox, data[1].IP, colorInBox, iconInBox, linkInBox, sizeInBox, firstReceiverBool)
                 firstReceiverBool = false
-            
+
             } else if (data[0].Type == "storageproof") {
                 var objectInBox = "Submits a proof for Contract ID"
                 var colorInBox = theme.text
@@ -1063,7 +1078,7 @@ function openTab(evt, cityName) {
                 var sizeInBox = 2
                 addSimpleBox(objectInBox, contractId, colorInBox, iconInBox, linkInBox, sizeInBox, firstReceiverBool)
                 firstReceiverBool = false
-            
+
             } else if (data[0].Type == "contractresol") {
                 if (data[1].Result == "fail") {
                     var objectInBox = "Renter address: returned allowance"
@@ -1076,11 +1091,11 @@ function openTab(evt, cityName) {
                 var iconInBox = "renter"
                 var addressInBox = shortHash(data[1].Output0Address)
                 var linkInBox = htmlPath + "?search=" + data[1].Output0Address
-                var valueInBox = readable(data[1].Output0Value) + " SC"
+                var valueInBox = readable(data[1].Output0Value) + " SCP"
                 var firstReceiverBool = true
                 addRowReceiver(objectInBox, linkInBox, addressInBox, valueInBox, iconInBox, firstReceiverBool, colorInBox)
                 var addressInBox2 = shortHash(data[1].Output1Address)
-                var valueInBox2 = readable(data[1].Output1Value) + " SC"
+                var valueInBox2 = readable(data[1].Output1Value) + " SCP"
                 var linkInBox2 = htmlPath + "?search=" + data[1].Output1Address
                 var iconInBox2 = "host"
                 var firstReceiverBool = false
@@ -1088,7 +1103,7 @@ function openTab(evt, cityName) {
                 if (data[1].Result == "fail") {
                     var objectInBox3 = "Burning address: lost collateral"
                     var addressInBox3 = shortHash(data[1].Output2Address)
-                    var valueInBox3 = readable(data[1].Output2Value) + " SC"
+                    var valueInBox3 = readable(data[1].Output2Value) + " SCP"
                     var linkInBox3 = htmlPath + "?search=" + data[1].Output2Address
                     var iconInBox3 = "burn"
                     var colorInBox = theme.brightRed
@@ -1098,7 +1113,7 @@ function openTab(evt, cityName) {
                 var objectInBox = "Formed Contract ID"
                 var addressInBox = shortHash(data[1].ContractId)
                 var totalSc = data[1].ValidProof1Value + data[1].ValidProof2Value
-                var valueInBox = readable(totalSc) + " SC"
+                var valueInBox = readable(totalSc) + " SCP"
                 var linkInBox = htmlPath + "?search=" + data[1].ContractId
                 var iconInBox = "contract"
                 var colorInBox = theme.darkGreen
@@ -1110,28 +1125,28 @@ function openTab(evt, cityName) {
                     for (var i = 0; i < data[5].transactions.length; i++) {
                         var objectInBox = "Renter address"
                         var addressInBox = shortHash(data[5].transactions[i].Address)
-                        var valueInBox = readable(data[5].transactions[i].ScChange) + " SC"
+                        var valueInBox = readable(data[5].transactions[i].ScChange) + " SCP"
                         var linkInBox = htmlPath + "?search=" + data[5].transactions[i].Address
                         var iconInBox = "renter"
                         var colorInBox = theme.darkGreen
                         var firstReceiverBool = false
                         addRowReceiver(objectInBox, linkInBox, addressInBox, valueInBox, iconInBox, firstReceiverBool, colorInBox)
                     }
-                }  
+                }    
 
                 // SiaFund fees
-                var objectInBox = "Fees paid to SF holders"
-                var valueInBox = readable(data[1].SfFees) + " SC"
+                var objectInBox = "Fees paid to SPF holders"
+                var valueInBox = readable(data[1].SfFees) + " SCP"
                 var linkInBox = ""
                 var iconInBox = "sfclaim"
                 var colorInBox = theme.darkGreen
                 var sizeInBox = 4
                 addSimpleBox(objectInBox, valueInBox, colorInBox, iconInBox, linkInBox, sizeInBox)
             }
-            
+
             // Miner fees. Not if it is a collateral post or an allowance post
             if (data[0].Type != "allowancePost" && data[0].Type != "collateralPost" && data[0].Type != "contractresol" && data[0].Type != "blockreward") {
-                var readableFees = readable(data[1].Fees) + " SC"
+                var readableFees = readable(data[1].Fees) + " SCP"
                 var objectInBox = "Miner fees"
                 var colorInBox = theme.darkGreen
                 var iconInBox = "miner"
@@ -1320,7 +1335,7 @@ function openTab(evt, cityName) {
             div.innerHTML =
             '<table id="scheme" class="table-outer scheme-outer" style="margin: 0px auto; padding: 0px auto; width: 1150px; text-align: left">'
                 + '<tr>'
-                    
+
                     + '<td class="address-box" style="background:inherit; height: 90px; width: 600px; padding: 0px">'
                         + '<table class="table-outer table-head-out" style="height: 50px">'
                             + '<th style="width: 30px; text-align: center">'
@@ -1353,9 +1368,9 @@ function openTab(evt, cityName) {
             div.className = 'row';
             var coinValue = ""
             if (data[1].ScValue > 0) {
-                coinValue = readable(data[1].ScValue) + " SC"
+                coinValue = readable(data[1].ScValue) + " SCP"
             } else if (data[1].SfValue > 0) {
-                coinValue = data[1].SfValue + " SF"
+                coinValue = data[1].SfValue + " SPF"
             }
             if (data[1].CreatedOnBlock == null) {data[1].CreatedOnBlock = "-"}
             if (data[1].SpentOnBlock == null) {data[1].SpentOnBlock = "-"}
@@ -1367,7 +1382,7 @@ function openTab(evt, cityName) {
                 var colorSpent = theme.accent
                 var textSpent = "Unspent"
             }
-                
+
             var tableCode = '<table id="table-fill" class="table-outer" style="width: 1150px">' 
                 + '<thead>'
                     + '<tr>'
@@ -1456,7 +1471,7 @@ function openTab(evt, cityName) {
 
             // Totals transacted. Not if a contract
             if (data[0].Type == "contract") {
-                transacted = readable(data[1].RenterValue + data[1].HostValue) + " SC"
+                transacted = readable(data[1].RenterValue + data[1].HostValue) + " SCP"
             } else {
                 var totalSc = 0
                 var totalSf = 0
@@ -1467,11 +1482,11 @@ function openTab(evt, cityName) {
                             totalSf = totalSf + data[2].transactions[n].SfChange
                         }
                     }
-                transacted = readable(totalSc + data[1].Fees) + " SC"
-                
+                transacted = readable(totalSc + data[1].Fees) + " SCP"
+
                 // Add SF to the result, only when there were trasnacted
                 if (totalSf != 0) {
-                    transacted = transacted + " / " + totalSf + " SF"
+                    transacted = transacted + " / " + totalSf + " SPF"
                 }
             }
 
@@ -1519,7 +1534,7 @@ function openTab(evt, cityName) {
                             + '<span style="vertical-align:center; font-size:medium">' + transacted + '</span>'
                         + '</td>'
                     + '</tr>'
-            
+
             // Additions for certain TX types
 
             if (data[0].Type == "allowancePost" || data[0].Type == "collateralPost") {
@@ -1570,7 +1585,7 @@ function openTab(evt, cityName) {
                         var textResult = "Failed"
                     }
                 }
-                
+
 
                 var tableCode = tableCode       
                     + '<tr>'
@@ -1645,11 +1660,11 @@ function openTab(evt, cityName) {
                     var sfFees = data[1].SfFees
                     var feesPercentage = (sfFees / (data[1].ValidProof1Value + data[1].ValidProof2Value + data[1].Fees 
                         + sfFees - data[1].HostValue) * 100).toFixed(2) // This avoid some errors on contracts formed by `us`
-                    var feesCell = readable(sfFees) + " SC <font size=2>(" + feesPercentage + "% of the renter's allowance)</font>"
+                    var feesCell = readable(sfFees) + " SCP <font size=2>(" + feesPercentage + "% of the renter's allowance)</font>"
                     //feesCell = feesPercentage
                     var tableCode = tableCode
                         + '<tr><td>'
-                                + '<span style="vertical-align:center"><font size="3">Fees paid to SF holders:</font></span>'
+                                + '<span style="vertical-align:center"><font size="3">Fees paid to SPF holders:</font></span>'
                             + '</td><td>'
                                 + '<span style="vertical-align:center; font-size: medium">' + feesCell + '</span>'
                         + '</td></tr>'
@@ -1662,22 +1677,22 @@ function openTab(evt, cityName) {
                             + '</td><td style="padding: 10px 15px">'
                                 + '<span style="vertical-align:center; font-size: medium">' 
                                     + '<svg style="vertical-align:middle; width: 20px; height: 20px; padding: 0px 10px 0px 0px"><use xlink:href="#renter-text" class="icon-text"/></svg>'
-                                    + " Returned allowance: " + readable(data[1].ValidProof1Value) + ' SC <br><br>'
+                                    + " Returned allowance: " + readable(data[1].ValidProof1Value) + ' SCP <br><br>'
                                     + '<svg style="vertical-align:middle; width: 20px; height: 20px; padding: 0px 10px 0px 0px"><use xlink:href="#host-text" class="icon-text"/></svg>'
-                                    + " Payout + collateral: " + readable(data[1].ValidProof2Value) + ' SC</span>'
+                                    + " Payout + collateral: " + readable(data[1].ValidProof2Value) + ' SCP</span>'
                         + '</td></tr>'
                         + '<tr><td>'
                                 + '<span style="vertical-align:center"><font size="3">Conditions upon fail:</font></span>'
                             + '</td><td style="padding: 10px 15px">'
                                 + '<span style="vertical-align:center; font-size: medium">' 
                                     + '<svg style="vertical-align:middle; width: 20px; height: 20px; padding: 0px 10px 0px 0px"><use xlink:href="#renter-text" class="icon-text"/></svg>'
-                                    + " Returned allowance: " + readable(data[1].MissedProof1Value) + ' SC <br><br>'
+                                    + " Returned allowance: " + readable(data[1].MissedProof1Value) + ' SCP <br><br>'
                                     + '<svg style="vertical-align:middle; width: 20px; height: 20px; padding: 0px 10px 0px 0px"><use xlink:href="#host-text" class="icon-text"/></svg>'
-                                    + " Returned collateral: " + readable(data[1].MissedProof2Value) + ' SC <br><br>'
+                                    + " Returned collateral: " + readable(data[1].MissedProof2Value) + ' SCP <br><br>'
                                     + '<svg style="vertical-align:middle; width: 20px; height: 20px; padding: 0px 10px 0px 0px"><use xlink:href="#burn-text" class="icon-text"/></svg>'
-                                    + " Burnt collateral: " + readable(data[1].MissedProof3Value) + ' SC </span>'
+                                    + " Burnt collateral: " + readable(data[1].MissedProof3Value) + ' SCP </span>'
                         + '</td></tr>'
-            
+
             } else if (data[0].Type == "storageproof") {
                 // In these cases, the Synonyms field is showing the Contract ID
                 var contractLink = htmlPath + "?search=" + data[1].ContractId
@@ -1699,7 +1714,7 @@ function openTab(evt, cityName) {
                             + '<span style="vertical-align:center; font-size: 11px">' + synonyms + '</span>'
                         + '</td>'
                     + '</tr>'
-            
+
             } else  if (data[0].Type == "host ann") {
                 tableCode = tableCode
                     + '<tr>'
@@ -1742,7 +1757,7 @@ function openTab(evt, cityName) {
                         + '</td>'
                     + '</tr>'
             }
-            
+
             // This closes the table
             tableCode = tableCode + '</thead> </table>'
             div.innerHTML = tableCode
@@ -1755,7 +1770,7 @@ function openTab(evt, cityName) {
 
 
         function renderContractRelated(data) {
-            
+
             var div = document.createElement('div');
             div.className = 'row';
             var tableCode = '<table id="table-fill" class="table-outer" style="width: 1150px">' 
@@ -1811,7 +1826,7 @@ function openTab(evt, cityName) {
                         + '<td style="font-size:small; border-right: 0px">' + timeConverter(data[3].Timestamp) + '</td>'
                     + '</tr>'
             }
-            
+
             // This closes the table
             tableCode = tableCode + '</thead> </table>'
             div.innerHTML = tableCode
@@ -1836,7 +1851,7 @@ function openTab(evt, cityName) {
                 + '</table>'
                 + '<div id="timeline" class="table-outer" style="height: 200px; margin: 0px auto; padding: 0px auto; width: 1150px" ></div>'
             document.getElementById('content4').appendChild(div);
-            
+
             // Google charts timeline
             google.charts.load('current', {'packages':['timeline']});
             google.charts.setOnLoadCallback(drawChart);
@@ -1896,7 +1911,7 @@ function openTab(evt, cityName) {
                     colors: [theme.grey3, 'orange', theme.brightRed, theme.darkGreen],
                     backgroundColor: theme.black,
                 };
-                
+
                 // This block of code changes the color of the time axis labels
                 google.visualization.events.addListener(chart, 'ready', function () {
                     var labels = container.getElementsByTagName('text');
@@ -1918,7 +1933,7 @@ function openTab(evt, cityName) {
                     + '<span style="font-size: 80px">:-( <br></span>'
                     + '<span style="font-size: 40px">Hash not found<br></span>'
                     + '<span style="font-size: 20px">If the transaction was recently broadcasted or included on a block, wait a few seconds and refresh<br></span>'
-                    + '<span style="font-size: 20px">Search also in the official Sia Explorer'
+                    + '<span style="font-size: 20px">Search also in the official Scp Explorer'
                         + '<a style="color: ' + theme.decoration + '" href="https://explore.sia.tech/hashes/' + search + '">'
                             + '<i style="font-size:20px; padding: 0px 0px 0px 5px" class="fa fa-external-link"></i>'
                         + '</a></span>'
@@ -1937,17 +1952,17 @@ function openTab(evt, cityName) {
 
             // Unconfirmed balances
             var pendingDiv = ""
-            if (data[1].pendingSc == 0 && data[1].pendingSf == 0) { pendingDiv = "0 SC / 0 SF" }
+            if (data[1].pendingSc == 0 && data[1].pendingSf == 0) { pendingDiv = "0 SCP / 0 SPF" }
             if (data[1].pendingSc > 0) {
-                pendingDiv = "<font style='color: " + theme.darkGreen + "'>+" + readable(data[1].pendingSc) + " SC</font>"
+                pendingDiv = "<font style='color: " + theme.darkGreen + "'>+" + readable(data[1].pendingSc) + " SCP</font>"
             } else if (data[1].pendingSc < 0) {
-                pendingDiv = "<font style='color: " + theme.brightRed + "'>" + readable(data[1].pendingSc) + " SC</font>"
+                pendingDiv = "<font style='color: " + theme.brightRed + "'>" + readable(data[1].pendingSc) + " SCP</font>"
             }
             if (data[1].pendingSc != 0 && data[1].pendingSf != 0) { pendingDiv = pendingDiv + " / "}
             if (data[1].pendingSf > 0) {
-                pendingDiv = pendingDiv + "<font style='color: purple'>+" + data[1].pendingSf + " SF</font>"
+                pendingDiv = pendingDiv + "<font style='color: purple'>+" + data[1].pendingSf + " SPF</font>"
             } else if (data[1].pendingSf < 0) {
-                pendingDiv = pendingDiv + "<font style='color: orange'>" + data[1].pendingSf + " SF</font>"
+                pendingDiv = pendingDiv + "<font style='color: orange'>" + data[1].pendingSf + " SPF</font>"
             }
 
             // Renders the balance table and a QR code of the address
@@ -1964,13 +1979,13 @@ function openTab(evt, cityName) {
                                     + '</th>'
                                 + '</tr>'
                                 + '<tr>'
-                                    + '<td style="height: 65px; padding: 0px 15px; font-size:110%; vertical-align:center;">Confirmed Siacoin balance: </td>'
-                                    + '<td style="height: 65px; padding: 0px 15px; font-size:110%; vertical-align:center; text-align: right">' + readable(data[1].balanceSc) + ' SC'
-                                        + '<br><span style="font-size: 12px">' + readable(data[1].receivedSc) + ' SC received / -' + readable(data[1].sentSc) + ' SC sent</span></td>'
+                                    + '<td style="height: 65px; padding: 0px 15px; font-size:110%; vertical-align:center;">Confirmed Scprime balance: </td>'
+                                    + '<td style="height: 65px; padding: 0px 15px; font-size:110%; vertical-align:center; text-align: right">' + readable(data[1].balanceSc) + ' SCP'
+                                        + '<br><span style="font-size: 12px">' + readable(data[1].receivedSc) + ' SCP received / -' + readable(data[1].sentSc) + ' SCP sent</span></td>'
                                 + '</tr>'
                                 + '<tr>'
-                                    + '<td style="height: 45px; padding: 0px 15px; font-size:110%; vertical-align:center;">Confirmed Siafund balance: </td>'
-                                    + '<td style="height: 45px; padding: 0px 15px; font-size:110%; vertical-align:center; text-align: right">' + data[1].balanceSf + ' SF</td>'
+                                    + '<td style="height: 45px; padding: 0px 15px; font-size:110%; vertical-align:center;">Confirmed Scprimefund balance: </td>'
+                                    + '<td style="height: 45px; padding: 0px 15px; font-size:110%; vertical-align:center; text-align: right">' + data[1].balanceSf + ' SPF</td>'
                                 + '</tr>'
                                 + '<tr>'
                                     + '<td style="height: 45px; padding: 0px 15px; font-size:110%; vertical-align:center;">Pending transactions: </td>'
@@ -1994,7 +2009,7 @@ function openTab(evt, cityName) {
                     + '</div>'
                 + '</div>'
             + '</div>'
-            
+
             div.innerHTML = tableCode
             document.getElementById('content').appendChild(div);
         }
@@ -2018,7 +2033,7 @@ function openTab(evt, cityName) {
             others.sort(function(a,b) {return (a.TxType > b.TxType) ? 1 : ((b.TxType > a.TxType) ? -1 : 0);} );
             contracts.sort(function(a,b) {return (a.TxType > b.TxType) ? 1 : ((b.TxType > a.TxType) ? -1 : 0);} );
 
-            var text = "Siacoin transactions"
+            var text = "Scprime transactions"
             drawBlockTxTable(scTxs, text)
             var text2 = "File contracts activity"
             drawBlockTxTable(contracts, text2)
@@ -2041,15 +2056,15 @@ function openTab(evt, cityName) {
                             + '<span style="vertical-align:center; margin: 0px 0px 0px 5px"><strong><font size="3">' + text + ':</font></strong></span>'
                         + '</th>'
                     + '</tr>'
-            
+
             // Iterates on each transaction
             for (var n = 0; n < txs.length; n++) {
                 // Tx type label and icon
                 if (txs[n].TxType == "ScTx") {
-                    var type = "Siacoin transfer"
+                    var type = "Scprime transfer"
                     var icon = "sctx"
                 } else if (txs[n].TxType == "SfTx") {
-                    var type = "Siafund transfer"
+                    var type = "Scprimefund transfer"
                     var icon = "sftx"
                 } else if (txs[n].TxType == "blockreward") {
                     var type = "Block reward"
@@ -2081,9 +2096,9 @@ function openTab(evt, cityName) {
                 }
 
                 if (txs[n].TxType == "SfTx") {
-                    var value = txs[n].TotalAmountSf + " SF / " + readable(txs[n].TotalAmountSc) + " SC"
+                    var value = txs[n].TotalAmountSf + " SPF / " + readable(txs[n].TotalAmountSc) + " SCP"
                 } else {
-                    var value = readable(txs[n].TotalAmountSc) + " SC"
+                    var value = readable(txs[n].TotalAmountSc) + " SCP"
                 }
 
 
@@ -2100,7 +2115,7 @@ function openTab(evt, cityName) {
                         + '</td>'
                     + '</tr>'
             }
-            
+
             // This closes the table
             tableCode = tableCode + '</thead> </table>'
             div.innerHTML = tableCode
@@ -2138,9 +2153,9 @@ function openTab(evt, cityName) {
             var contractSize = readableContractsize + ' <span style="font-size: 70%; padding: 0px 0px 0px 10px">' + data[1].TotalContractSize + " bytes</span>"
 
             readableContractcost = ""
-            if (data[1].TotalContractCost >= 1000000000000000000000000000000 && data[1].TotalContractCost < 1000000000000000000000000000000000) {readableContractcost = (data[1].TotalContractCost/1000000000000000000000000000000).toFixed(2) + " millions SC"}
-            if (data[1].TotalContractCost >= 1000000000000000000000000000000000 && data[1].TotalContractCost < 1000000000000000000000000000000000000) {readableContractcost = (data[1].TotalContractCost/1000000000000000000000000000000000).toFixed(2) + " billions SC"}
-            var contractCost = readableContractcost + ' <span style="font-size: 70%; padding: 0px 0px 0px 10px">' + parseInt(data[1].TotalContractCost / 1000000000000000000000000) + " SC</span>"
+            if (data[1].TotalContractCost >= 1000000000000000000000000000000 && data[1].TotalContractCost < 1000000000000000000000000000000000) {readableContractcost = (data[1].TotalContractCost/1000000000000000000000000000000).toFixed(2) + " thousands SCP"}
+            if (data[1].TotalContractCost >= 1000000000000000000000000000000000 && data[1].TotalContractCost < 1000000000000000000000000000000000000) {readableContractcost = (data[1].TotalContractCost/1000000000000000000000000000000000).toFixed(2) + " millions SCP"}
+            var contractCost = readableContractcost + ' <span style="font-size: 70%; padding: 0px 0px 0px 10px">' + parseInt(data[1].TotalContractCost / 1000000000000000000000000000) + " SCP</span>"
 
             var readableActivecontractsize = ""
             if (data[1].ActiveContractSize >= 1073741824 && data[1].ActiveContractSize < 1099511627776) {readableActivecontractsize = ((data[1].ActiveContractSize/1073741824).toFixed(2)) + " GB"}
@@ -2150,11 +2165,11 @@ function openTab(evt, cityName) {
             var activeContractSize = readableActivecontractsize + ' <span style="font-size: 70%; padding: 0px 0px 0px 10px">' + data[1].ActiveContractSize + " bytes</span>"
 
             var readableActivecontractcost = ""
-            if (data[1].ActiveContractCost >= 1000000000000000000000000000000 && data[1].ActiveContractCost < 1000000000000000000000000000000000) {readableActivecontractcost = (data[1].ActiveContractCost/1000000000000000000000000000000).toFixed(2) + " millions SC"}
-            if (data[1].ActiveContractCost >= 1000000000000000000000000000000000 && data[1].ActiveContractCost < 1000000000000000000000000000000000000) {readableActivecontractcost = (data[1].ActiveContractCost/1000000000000000000000000000000000).toFixed(2) + " billions SC"}
-            var activeContractCost = readableActivecontractcost + ' <span style="font-size: 70%; padding: 0px 0px 0px 10px">' + parseInt(data[1].ActiveContractCost / 1000000000000000000000000) + " SC</span>"
+            if (data[1].ActiveContractCost >= 1000000000000000000000000000000 && data[1].ActiveContractCost < 1000000000000000000000000000000000) {readableActivecontractcost = (data[1].ActiveContractCost/1000000000000000000000000000000).toFixed(2) + " thousands SCP"}
+            if (data[1].ActiveContractCost >= 1000000000000000000000000000000000 && data[1].ActiveContractCost < 1000000000000000000000000000000000000) {readableActivecontractcost = (data[1].ActiveContractCost/1000000000000000000000000000000000).toFixed(2) + " millions SCP"}
+            var activeContractCost = readableActivecontractcost + ' <span style="font-size: 70%; padding: 0px 0px 0px 10px">' + parseInt(data[1].ActiveContractCost / 1000000000000000000000000000) + " SCP</span>"
 
-            var totalCoins = (data[1].TotalCoins/1000000000000000000000000000000000).toFixed(2) + ' billions of SC <span style="font-size: 70%; padding: 0px 0px 0px 10px">' + parseInt(data[1].TotalCoins/1000000000000000000000000) + " SC</span>"
+            var totalCoins = (data[1].TotalCoins/1000000000000000000000000000000000).toFixed(2) + ' millions of SCP <span style="font-size: 70%; padding: 0px 0px 0px 10px">' + parseInt(data[1].TotalCoins/1000000000000000000000000000) + " SCP</span>"
 
             var div = document.createElement('div');
             div.className = 'row';
@@ -2300,7 +2315,7 @@ function openTab(evt, cityName) {
         // Shows the list of changes in balance for a particular address
         var div = document.createElement('div');
         div.className = 'row';
-        
+
         var tableCode = '<table id="table-fill" class="table-outer" style="width: 1150px">' 
             + '<thead>'
                 + '<tr>'
@@ -2308,7 +2323,7 @@ function openTab(evt, cityName) {
                         + '<span style="vertical-align:center; margin: 0px 0px 0px 5px"><strong><font size="3">Last 100 transactions:</font></strong></span>'
                     + '</th>'
                 + '</tr>'
-        
+
 
         // Unconfirmed transactions
         if (unconfirmedTxs != null) {
@@ -2318,11 +2333,11 @@ function openTab(evt, cityName) {
                 var icon = typeAndIcon[1]
 
                 if (unconfirmedTxs[i].SfValue != 0) {
-                    var value = unconfirmedTxs[i].SfValue + " SF"
+                    var value = unconfirmedTxs[i].SfValue + " SPF"
                     if (unconfirmedTxs[i].SfValue > 0) {var color = "purple"}
                     else {var color = "orange"}
                 } else {
-                    var value = readable(unconfirmedTxs[i].ScValue) + " SC"
+                    var value = readable(unconfirmedTxs[i].ScValue) + " SCP"
                     if (unconfirmedTxs[i].ScValue > 0) {
                         var color = theme.darkGreen
                     } else {
@@ -2335,7 +2350,7 @@ function openTab(evt, cityName) {
                             + '<svg style="width: 25px; height: 25px"><use xlink:href="#' + icon + '-text" class="icon-text"/></svg>'
                         + '<td style="padding: 0px 0px 0px 10px; border-right: 0px; font-size:small">' + type + '</td>'
                         + '<td style="font-size:x-small; border-right: 0px"></td>'
-                
+
                 // Date only added in wide and medium screens
                 if ($(window).width() >= 800) {
                     tableCode = tableCode + '<td style="font-size:small; border-right: 0px">' + timeConverter(unconfirmedTxs[i].Timestamp) + '</td>'
@@ -2351,20 +2366,20 @@ function openTab(evt, cityName) {
                     + '</tr>'
             }
         }
-        
+
 
         // Iterates on each transaction
         for (var n = 0; n < txs.length; n++) {
             var typeAndIcon = txTypeIconAndText(txs[n].TxType)
             var type = typeAndIcon[0]
             var icon = typeAndIcon[1]
-            
+
             if (txs[n].SfChange != 0) {
-                var value = txs[n].SfChange + " SF"
+                var value = txs[n].SfChange + " SPF"
                 if (txs[n].SfChange > 0) {var color = "purple"}
                 else {var color = "orange"}
             } else {
-                var value = readable(txs[n].ScChange) + " SC"
+                var value = readable(txs[n].ScChange) + " SCP"
                 if (txs[n].ScChange > 0) {
                     var color = theme.darkGreen
                 } else {
@@ -2391,7 +2406,7 @@ function openTab(evt, cityName) {
                     + '<td style="padding: 0px 0px 0px 10px; border-right: 0px; font-size:small"><a href=' + htmlPath + '?search=' + txs[n].MasterHash + '>' + type + '</a></td>'
                     + '<td style="font-size:x-small; border-right: 0px"><a href=' + htmlPath + '?search=' + txs[n].MasterHash + '>'
                         + superShortHash(txs[n].MasterHash) + '</a></td>'
-            
+
             // Date only added in wide and medium screens
             if ($(window).width() >= 800) {
                 tableCode = tableCode
@@ -2410,7 +2425,7 @@ function openTab(evt, cityName) {
                     + '</td>'
                 + '</tr>'
         }
-        
+
         // This closes the table
         tableCode = tableCode + '</thead> </table>'
         div.innerHTML = tableCode
@@ -2425,13 +2440,13 @@ function openTab(evt, cityName) {
     function txTypeIconAndText(txType) {
         // Tx type label and icon
         if (txType == "ScTx") {
-            var type = "Siacoin transfer"
+            var type = "Scprime transfer"
             var icon = "sctx"
         } else if (txType == "SfTx") {
-            var type = "Siafund transfer"
+            var type = "Scprimefund transfer"
             var icon = "sftx"
         } else if (txType == "SfClaim") {
-            var type = "SF dividend claim"
+            var type = "SPF dividend claim"
             var icon = "sfclaim"
         } else if (txType == "blockreward") {
             var type = "Block reward"
@@ -2482,10 +2497,10 @@ function openTab(evt, cityName) {
                     + document.getElementById("loader").innerHTML
                 + '</div><div style="margin: 0px auto; max-width: 1150px; min-width: 550; font-size: 120%; color: ' + theme.boxHeaders + '; font-style: italic; text-align: center">This can take a while, be patient</div>'
             document.getElementById("content3").setAttribute("style","height: 300px");
-            
+
             var jsonPath = apiPath + '/unspent_outputs/' + searchQuery
             $.getJSON(jsonPath, function(outputs) {
-                
+
                 // Table of outputs
                 var tableOutputs = '<div class="adjustable" style="width: 1150px; margin: 0px auto; padding: 0px auto">'
                     + '<table id="table-fill" class="table-outer">' 
@@ -2502,12 +2517,12 @@ function openTab(evt, cityName) {
                     for (var i = 0; i < outputs.length; i++) {
                         tableOutputs = tableOutputs + '<tr style="height: 40px"><td style="padding: 0px 0px 0px 20px; border-right: 0px; font-size:11px">'
                             + '<a href=' + htmlPath + "?search=" + outputs[i].output + '><code>' + outputs[i].output + '</code></a></td>'
-                            + '<td style="padding: 0px 10px 0px 0px; font-size:small; font-weight: bold; text-align: right">' + readable(outputs[i].hastings) + ' SC</td></tr>'
+                            + '<td style="padding: 0px 10px 0px 0px; font-size:small; font-weight: bold; text-align: right">' + readable(outputs[i].hastings) + ' SCP</td></tr>'
                     } 
                 }
-                
+
                 var tableOutputs = tableOutputs + "</thead></table></div>"
-                
+
                 document.getElementById("content3").removeEventListener("click", loadoutputs)
                 document.getElementById("content3").setAttribute("style","height: auto");
                 document.getElementById("content3").innerHTML = tableOutputs
@@ -2588,8 +2603,8 @@ function openTab(evt, cityName) {
             var endDate = $('#endDate').val();
             submitCSV(addressesArray, checkbox, currency, startDate, endDate)
         })
-        
-        
+
+
         // Balances box
         var div2 = document.createElement('div');
         div2.className = 'row';
@@ -2649,7 +2664,7 @@ function openTab(evt, cityName) {
             submitBalanceRequest(addressesArray, currency)
         })
 
-                        
+
         // Makes the collapsible boxes clickable and animated
         collpasibleClick()
     }
@@ -2696,7 +2711,7 @@ function openTab(evt, cityName) {
             if (endDate > startDate) {
                 // Loader
                 document.getElementById("options-box").innerHTML = '</div><div class="mini-loader" id="mini-loader" style="margin: 25px auto;"></div>'
-                
+
                 var pathPost = apiPath + "/csv-file"
                 $.post(pathPost,
                 {
@@ -2757,27 +2772,27 @@ function openTab(evt, cityName) {
                         + '<div id="containerChartBalance" style="padding: 0px, 25px"></div>'
                         + '<div style="position: absolute; top: 0px; left: ' + switchPosistion + '">'
                             + '<button id="scBalanceSwitch" style="border-radius: 10px 0px 0px 10px; border: 3px solid ' + theme.text 
-                                + '; background-color: ' + theme.accentFaded1 + '; color: ' + theme.text + '; padding: 0px 20px; cursor: pointer; font-weight: 700">SC</button>'
+                                + '; background-color: ' + theme.accentFaded1 + '; color: ' + theme.text + '; padding: 0px 20px; cursor: pointer; font-weight: 700">SCP</button>'
                             + '<button id="sfBalanceSwitch" style="border-radius: 0px 10px 10px 0px; border: 3px solid ' + theme.text 
-                                + '; background-color: ' + theme.accentFaded1 + '; color: ' + theme.text + '; padding: 0px 20px; cursor: pointer; font-weight: 700">SF</button>'
+                                + '; background-color: ' + theme.accentFaded1 + '; color: ' + theme.text + '; padding: 0px 20px; cursor: pointer; font-weight: 700">SPF</button>'
                         + '</div>'
                     + '</div>'
 
-                    renderBalanceChart("SC", currency, data.scJson, data.scUsdJson) // Default rendering
+                    renderBalanceChart("SCP", currency, data.scJson, data.scUsdJson) // Default rendering
                     $("#scBalanceSwitch").click("click", function() {
-                        renderBalanceChart("SC", currency, data.scJson, data.scUsdJson)
+                        renderBalanceChart("SCP", currency, data.scJson, data.scUsdJson)
                     })
                     $("#sfBalanceSwitch").click("click", function() {
-                        renderBalanceChart("SF", currency, data.sfJson, data.sfUsdJson)
+                        renderBalanceChart("SPF", currency, data.sfJson, data.sfUsdJson)
                     })
                 } else {
                     document.getElementById("options-box2").innerHTML = '<div id="containerChartBalance" style="padding: 0px, 25px"></div>'
                 }
 
                 if (data.scDataBool == true && data.sfDataBool == false) {
-                    renderBalanceChart("SC", currency, data.scJson, data.scUsdJson) // Default rendering
+                    renderBalanceChart("SCP", currency, data.scJson, data.scUsdJson) // Default rendering
                 } else if (data.scDataBool == false && data.sfDataBool == true) {
-                    renderBalanceChart("SF", currency, data.sfJson, data.sfUsdJson) // Default rendering
+                    renderBalanceChart("SPF", currency, data.sfJson, data.sfUsdJson) // Default rendering
                 }
 
             } else {
@@ -2882,10 +2897,10 @@ function openTab(evt, cityName) {
         });
     }
 
-    
+
     function readable(number) {
         // Transforms numbers into readable: significant decimal digits, 3-digit separators
-        number = number / 1000000000000000000000000
+        number = number / 1000000000000000000000000000
         var original = number
         if (number < 0) {
             number = Math.abs(number)
@@ -2895,7 +2910,7 @@ function openTab(evt, cityName) {
         }
         integer = Math.floor(number)
         decimal = number - integer
-        
+
         // The decimals
         if (Math.abs(original) < 1) {
             decimal = decimal.toFixed(4)
@@ -2914,7 +2929,7 @@ function openTab(evt, cityName) {
                 integer++
             }
         }
-        
+
         // Segmenting the integer part
         numTxt = integer.toString()
         var segments = []
@@ -3056,4 +3071,4 @@ $(document).ready(function() {
     // Footer
     document.getElementById("footer").innerHTML = "<a href=" + githubRepository
         + " style='color: " + theme.black + "; text-decoration: none'><i class='fa fa-github' style='font-size:32px; color: " + theme.footerText + "'></i><a/>"
-});  
+});

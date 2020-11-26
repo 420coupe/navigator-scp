@@ -1,27 +1,29 @@
 {
-  "name": "navigator-sia",
+  "name": "navigator-scp",
   "version": "2.0.0",
-  "description": "An advanced blockchain explorer for the Sia network",
+  "description": "An advanced blockchain explorer for the Scp network",
   "main": "navigator.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hakkane84/navigator-sia.git"
+    "url": "git+https://github.com/420coupe/navigator-scp.git"
   },
   "keywords": [
-    "sia",
+    "scprime",
+    "scp",
     "blockchain",
     "explorer"
   ],
-  "author": "Salvador Herrera",
+  "author": "420coupe",
   "license": "AGPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/hakkane84/navigator-sia/issues"
+    "url": "https://github.com/420coupe/navigator-scp/issues"
   },
-  "homepage": "https://github.com/hakkane84/navigator-sia#readme",
+  "homepage": "https://github.com/420coupe/navigator-scp#readme",
   "dependencies": {
+    "@babel/runtime": "^7.12.5",
     "axios": "^0.19.2",
     "babel-runtime": "^6.26.0",
     "body-parser": "^1.19.0",
@@ -32,7 +34,7 @@
     "mssql": "^5.1.0",
     "qrcode": "^1.4.4",
     "request-promise": "^4.2.4",
-    "sia.js": "^0.4.2",
+    "scprime.js": "github:420coupe/Nodejs-SiaPrime",
     "sqlite3": "^4.1.1",
     "strip-json-comments": "^3.1.0"
   }
